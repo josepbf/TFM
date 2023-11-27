@@ -1,6 +1,7 @@
 # Source: https://pytorch.org/vision/stable/models.html#object-detection
 import torchvision
 
+
 class Model:
     def __init__(self, 
                 model_name,
@@ -19,7 +20,7 @@ class Model:
             # Faster R-CNN: Towards Real-Time Object Detection with Region 
             # Proposal Networks paper.
             torchvision.models.detection.fasterrcnn_resnet50_fpn(
-                weights=FasterRCNN_ResNet50_FPN_Weights.DEFAULT, 
+                weights='DEFAULT', 
                 num_classes=num_classes, 
                 pretrained_backbone=pretrained_backbone, 
                 trainable_backbone_layers=trainable_backbone_layers) # Valid values are between 0 and 5
@@ -29,7 +30,7 @@ class Model:
             # backbone from Benchmarking Detection Transfer Learning with Vision 
             # Transformers paper.
             torchvision.models.detection.fasterrcnn_resnet50_fpn_v2(
-                weights=FasterRCNN_ResNet50_FPN_V2_Weights.DEFAULT, 
+                weights='DEFAULT', 
                 num_classes=num_classes, 
                 pretrained_backbone=pretrained_backbone, 
                 trainable_backbone_layers=trainable_backbone_layers) # Valid values are between 0 and 5
