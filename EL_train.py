@@ -8,7 +8,7 @@ import pandas as pd
 import random
 import time
 
-from EL_models import CreateNet
+from EL_models import Model
 from EL_dataset import PVDefectsDStrain
 from EL_train_utils import train_one_epoch
 
