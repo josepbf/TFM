@@ -13,7 +13,7 @@ class Model:
         self.trainable_backbone_layers = trainable_backbone_layers
         self.pretrained_backbone = pretrained_backbone
 
-        elif model_name == 'FasterRCNN_ResNet-50-FPN':
+        if model_name == 'FasterRCNN_ResNet-50-FPN':
             # Faster R-CNN model with a ResNet-50-FPN backbone from the 
             # Faster R-CNN: Towards Real-Time Object Detection with Region 
             # Proposal Networks paper.
