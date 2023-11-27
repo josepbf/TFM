@@ -32,6 +32,6 @@ nvidia-smi
 
 source ../myVirtEnv/bin/activate
 
-python3 EL_train.py --name trialanderror
+python3 EL_train.py 
 
 deactivate

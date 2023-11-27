@@ -30,7 +30,7 @@ parser.add_argument("--seed", type=int, default=0, help="random seed")
 # Saving
 parser.add_argument("-E", "--save_model_epochs", type=int, default=0, help="save the model every this number of epochs")
 parser.add_argument("-O", "--save_optim", action='store_true', help="save the optimizer state at the end")
-parser.add_argument("name", help="Name to be saved")
+#parser.add_argument("name", help="Name to be saved")
 
 # Training param
 parser.add_argument("-e", "--num_epochs", type=int, default=1, help="number of epochs")
