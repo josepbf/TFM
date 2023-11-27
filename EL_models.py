@@ -19,7 +19,7 @@ class Model:
             # Faster R-CNN: Towards Real-Time Object Detection with Region 
             # Proposal Networks paper.
             torchvision.models.detection.fasterrcnn_resnet50_fpn(
-                pretrained=pretrained, 
+                weights=FasterRCNN_ResNet50_FPN_Weights.DEFAULT, 
                 num_classes=num_classes, 
                 pretrained_backbone=pretrained_backbone, 
                 trainable_backbone_layers=trainable_backbone_layers) # Valid values are between 0 and 5
@@ -29,7 +29,7 @@ class Model:
             # backbone from Benchmarking Detection Transfer Learning with Vision 
             # Transformers paper.
             torchvision.models.detection.fasterrcnn_resnet50_fpn_v2(
-                pretrained=pretrained, 
+                weights=FasterRCNN_ResNet50_FPN_V2_Weights.DEFAULT, 
                 num_classes=num_classes, 
                 pretrained_backbone=pretrained_backbone, 
                 trainable_backbone_layers=trainable_backbone_layers) # Valid values are between 0 and 5
