@@ -106,7 +106,7 @@ if seed != 0:
     torch.manual_seed(seed)
 
 # Create the custom dataset
-dataset_train = PVDefectsDStrain('', get_transform(train=True)) #TODO train, validation, calibration, tests
+dataset_train = PVDefectsDStrain(get_transform(train=True)) #TODO train, validation, calibration, tests
 
 # Create a DataLoader for batching and shuffling the data
 trainloader = DataLoader(dataset_train, batch_size=batch_size, num_workers=num_workers, shuffle=True) 
