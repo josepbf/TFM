@@ -30,7 +30,7 @@ nvidia-smi
 #module load PIL
 #module load matplotlib
 
-source myVirtEnv/bin/activate
+source ../myVirtEnv/bin/activate
 
 python3 Baseline_Classification.py
 
