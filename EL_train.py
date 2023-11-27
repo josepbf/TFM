@@ -96,7 +96,7 @@ batch_size = config['batch_size']
 #label_smoothing = config['label_smoothing']
 
 # Model name
-model_name = config['name']
+model_name = config['model_name']
 trainable_backbone_layers = config['trainable_backbone_layers']
 net = Model(model_name=model_name, trainable_backbone_layers=trainable_backbone_layers)
 
