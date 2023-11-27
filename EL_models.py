@@ -1,4 +1,5 @@
 # Source: https://pytorch.org/vision/stable/models.html#object-detection
+import torchvision
 
 class Model:
     def __init__(self, 
