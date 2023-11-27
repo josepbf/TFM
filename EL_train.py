@@ -93,7 +93,7 @@ if nesterov == 1:
 # Hyper-parameters 
 num_epochs = config['num_epochs']
 batch_size = config['batch_size']
-label_smoothing = config['label_smoothing']
+#label_smoothing = config['label_smoothing']
 
 # Model name
 model_name = config['name']
