@@ -544,6 +544,10 @@ class MetricLogger(object):
     def __str__(self):
         loss_str = []
         for name, meter in self.meters.items():
+            print("name: asjdoasd")
+            print(name)
+            print("meter: asdoad")
+            print(meter)
             loss_str.append(
                 "{}: {}".format(name, str(meter))
             )
