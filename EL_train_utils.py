@@ -1,4 +1,6 @@
-from EL_utils import MetricLogger
+import math
+
+from EL_utils import MetricLogger, SmoothedValue, reduce_dict
 
 def train_one_epoch(model, optimizer, data_loader, device, epoch, print_freq, iteration):
     model.train()
