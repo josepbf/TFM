@@ -1,3 +1,6 @@
+import collections
+from collections import defaultdict, deque
+
 def loss_one_epoch_val(model, optimizer, data_loader, device, epoch, print_freq, iteration):
     metric_logger = MetricLogger(delimiter="  ")
     metric_logger.add_meter('lr', SmoothedValue(window_size=1, fmt='{value:.6f}'))

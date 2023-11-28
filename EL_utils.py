@@ -1,3 +1,5 @@
+import collections
+from collections import defaultdict, deque
 
 def compute_confusion_matrix_training(epoch, isValData = False, iou_threshold = 0.5):
   # Read all the names of outputs
