@@ -1,7 +1,9 @@
+from EL_utils import MetricLogger
+
 def train_one_epoch(model, optimizer, data_loader, device, epoch, print_freq, iteration):
     model.train()
-    #metric_logger = MetricLogger(delimiter="  ")
-    #metric_logger.add_meter('lr', SmoothedValue(window_size=1, fmt='{value:.6f}'))
+    metric_logger = MetricLogger(delimiter="  ")
+    metric_logger.add_meter('lr', SmoothedValue(window_size=1, fmt='{value:.6f}'))
     header = 'Epoch: [{}]'.format(epoch)
 
     #lr_scheduler = None
