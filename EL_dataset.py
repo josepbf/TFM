@@ -146,8 +146,8 @@ class PVDefectsDStrain(torch.utils.data.Dataset):
 
         # load images
         img = Image.open(img_path)
-        img = torchvision.transforms.functional.resize(img, (300,300))
         original_size = img.size[::-1]
+        img = torchvision.transforms.functional.resize(img, (300,300))
 
         image_name = self.imgs_names[0]["namesAllCells"].values[idx]
         image_id = ''
