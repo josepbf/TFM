@@ -7,7 +7,7 @@ from EL_utils import MetricLogger, SmoothedValue, reduce_dict
 def train_one_epoch(model, optimizer, data_loader, device, epoch, print_freq, iteration):
     model.train()
     metric_logger = MetricLogger(delimiter="  ")
-    metric_logger.add_meter('lr', SmoothedValue(window_size=1, fmt='{value:.6f}'))
+    #metric_logger.add_meter('lr', SmoothedValue(window_size=1, fmt='{value:.6f}'))
     header = 'Epoch: [{}]'.format(epoch)
 
     for images, targets in metric_logger.log_every(data_loader, print_freq, epoch, header):
