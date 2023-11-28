@@ -117,7 +117,7 @@ net_params = [p for p in net.parameters() if p.requires_grad]
 optimizer_instance = Optimizer(net_params,
                 optim_name,
                 optim_default,
-                lr,
+                learning_rate,
                 rho,
                 weight_decay, # L2 penalty
                 momentum,
