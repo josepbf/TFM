@@ -4,6 +4,7 @@ from torch.utils.data import Dataset
 
 import torchvision.transforms as transforms
 import torchvision.transforms.functional as TF
+from torchvision import transforms as T
 
 import PIL
 from PIL import Image
