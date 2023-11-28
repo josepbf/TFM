@@ -9,7 +9,7 @@ import random
 import time
 
 from EL_models import Model
-from EL_dataset import PVDefectsDStrain, get_transform
+from EL_dataset import PVDefectsDStrain, get_transform, collate_fn
 from EL_train_utils import train_one_epoch
 from EL_optim import Optimizer
 
@@ -110,7 +110,7 @@ if seed != 0:
 dataset_train = PVDefectsDStrain(get_transform(train=True)) #TODO train, validation, calibration, tests
 
 # Create a DataLoader for batching and shuffling the data
-trainloader = DataLoader(dataset_train, batch_size=batch_size, num_workers=num_workers, shuffle=True) 
+trainloader = DataLoader(dataset_train, batch_size=batch_size, num_workers=num_workers, shuffle=True, collate_fn = collate_fn)
 
 # Loss function 
 net_params = [p for p in net.parameters() if p.requires_grad]
