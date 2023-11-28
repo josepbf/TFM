@@ -205,14 +205,18 @@ class PVDefectsDStrain(torch.utils.data.Dataset):
           bbox.append((0, 0, 300, 300))
           bbox = torch.tensor(bbox, dtype=torch.float)
           target['boxes'] = bbox
-          target['labels'] = torch.empty(0, dtype=torch.int64)
+          labels = []
+          labels.append(0)
+          labels = torch.tensor(labels, dtype=torch.int64)
+          target['labels'] = labels
           area = 300*300
           areas = []
           areas.append(area)
           areas = torch.tensor(areas, dtype=torch.int64)
           target['area'] = areas
           target['image_id'] = torch.tensor(image_id, dtype=torch.int64)
-          target["iscrowd"] = torch.empty(0)
+          iscrowd = torch.zeros((1,), dtype=torch.int64) # suppose all instances are not crowd
+          target["iscrowd"] = iscrowd
 
         if self.transforms is not None:
           img, target = self.transforms(img,target)
