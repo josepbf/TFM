@@ -32,9 +32,9 @@ class Optimizer:
         # Adagrad
         if optim_name == 'Adagrad':
             if optim_default:
-                self.optim = torch.optim.Adagrad(params = self.net_param, lr=0.01 weight_decay=0)
+                self.optim = torch.optim.Adagrad(params = self.net_param, lr=0.01, weight_decay=0)
             else:
-                self.optim = torch.optim.Adagrad(params = self.net_param, lr=self.lr weight_decay=self.weight_decay)
+                self.optim = torch.optim.Adagrad(params = self.net_param, lr=self.lr, weight_decay=self.weight_decay)
 
         # Adam
         elif optim_name == 'Adam':
