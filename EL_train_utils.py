@@ -10,13 +10,6 @@ def train_one_epoch(model, optimizer, data_loader, device, epoch, print_freq, it
     metric_logger.add_meter('lr', SmoothedValue(window_size=1, fmt='{value:.6f}'))
     header = 'Epoch: [{}]'.format(epoch)
 
-    #lr_scheduler = None
-    #if epoch == 0:
-        #warmup_factor = 1. / 1000
-        #warmup_iters = min(1000, len(data_loader) - 1)
-
-        #lr_scheduler = warmup_lr_scheduler(optimizer, warmup_iters, warmup_factor)
-
     for images, targets in metric_logger.log_every(data_loader, print_freq, epoch, header):
 
         iteration = iteration + 1
@@ -57,9 +50,6 @@ def train_one_epoch(model, optimizer, data_loader, device, epoch, print_freq, it
         optimizer.zero_grad()
         losses.backward()
         optimizer.step()
-
-        #if lr_scheduler is not None:
-        #    lr_scheduler.step()
 
         #metric_logger.update(loss=losses_reduced, **loss_dict_reduced)
         #metric_logger.update(lr=optimizer.param_groups[0]["lr"])

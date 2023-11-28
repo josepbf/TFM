@@ -2,6 +2,7 @@ import torch
 from torch import Tensor
 from torch.utils.data import Dataset
 
+import torchvision
 import torchvision.transforms as transforms
 import torchvision.transforms.functional as TF
 from torchvision.transforms import functional as F
