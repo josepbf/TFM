@@ -19,6 +19,7 @@ from PIL import Image
 import numpy as np
 import pandas
 
+import math
 import random
 
 import os
@@ -146,6 +147,7 @@ class PVDefectsDStrain(torch.utils.data.Dataset):
         # load images
         img = Image.open(img_path)
         img = torchvision.transforms.functional.resize(img, (300,300))
+        original_size = img.size[::-1]
 
         image_name = self.imgs_names[0]["namesAllCells"].values[idx]
         image_id = ''
@@ -168,10 +170,10 @@ class PVDefectsDStrain(torch.utils.data.Dataset):
           if number_of_boxes > 1:
             for i in range(number_of_boxes):
               mask = masks[:,:,i]
-              xmin = min(np.where(mask != 0)[1])
-              xmax = max(np.where(mask != 0)[1])
-              ymin = min(np.where(mask != 0)[0])
-              ymax = max(np.where(mask != 0)[0])
+              xmin = math.trunc(min(np.where(mask != 0)[1]) * (300 / original_size[0])) 
+              xmax = math.trunc(max(np.where(mask != 0)[1]) * (300 / original_size[0]))
+              ymin = math.trunc(min(np.where(mask != 0)[0]) * (300 / original_size[1]))
+              ymax = math.trunc(max(np.where(mask != 0)[0]) * (300 / original_size[1]))
 
               area = (xmax-xmin)*(ymax-ymin)
               bbox.append((xmin, ymin, xmax, ymax))
@@ -179,10 +181,10 @@ class PVDefectsDStrain(torch.utils.data.Dataset):
               areas.append(area)
               labels.append(img_class)
           else:
-            xmin = min(np.where(mask != 0)[1])
-            xmax = max(np.where(mask != 0)[1])
-            ymin = min(np.where(mask != 0)[0])
-            ymax = max(np.where(mask != 0)[0])
+            xmin = math.trunc(min(np.where(mask != 0)[1]) * (300 / original_size[0]))
+            xmax = math.trunc(max(np.where(mask != 0)[1]) * (300 / original_size[0]))
+            ymin = math.trunc(min(np.where(mask != 0)[0]) * (300 / original_size[1]))
+            ymax = math.trunc(max(np.where(mask != 0)[0]) * (300 / original_size[1]))
 
             area = (xmax-xmin)*(ymax-ymin)
             bbox.append((xmin, ymin, xmax, ymax))
