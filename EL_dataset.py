@@ -201,9 +201,16 @@ class PVDefectsDStrain(torch.utils.data.Dataset):
         else:
           print("Target is empty.")
           target = {}
-          target['boxes'] = torch.empty(0,4)
+          bbox = []
+          bbox.append((0, 0, 300, 300))
+          bbox = torch.tensor(bbox, dtype=torch.float)
+          target['boxes'] = bbox
           target['labels'] = torch.empty(0, dtype=torch.int64)
-          target['area'] = torch.empty(0)
+          area = 300*300
+          areas = []
+          areas.append(area)
+          areas = torch.tensor(areas, dtype=torch.int64)
+          target['area'] = areas
           target['image_id'] = torch.tensor(image_id, dtype=torch.int64)
           target["iscrowd"] = torch.empty(0)
 
