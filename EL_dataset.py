@@ -23,7 +23,6 @@ import os
 
 from ast import literal_eval as make_tuple
 
-
 # TODO Add more transformations for data augmentations from EL_training_utils
 
 class ToTensor(object):
