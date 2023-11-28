@@ -11,6 +11,8 @@ from torchvision.transforms import GaussianBlur
 from torchvision.transforms import RandomEqualize
 from torchvision.transforms import ColorJitter
 
+import scipy.io
+
 import PIL
 from PIL import Image
 
