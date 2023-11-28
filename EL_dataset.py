@@ -118,6 +118,7 @@ class PVDefectsDStrain(torch.utils.data.Dataset):
 
     def __getitem__(self, idx):
         # define paths
+        dataset_path = "/zhome/de/6/201864/Downloads/PVDefectsDS/"
         img_path = dataset_path + "/CellsImages/CellsGS/" + str(self.imgs_names[0]["namesAllCells"].values[idx][:5]) + "_" + str(self.imgs_names[0]["namesAllCells"].values[idx][5:12]) + "GS" + str(self.imgs_names[0]["namesAllCells"].values[idx][12:]) + ".png"
         img_class = int(self.imgs_names[0]["nbDefAllCellsVH"].values[idx])
         if img_class != 0:
