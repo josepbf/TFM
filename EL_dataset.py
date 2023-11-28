@@ -124,8 +124,8 @@ class PVDefectsDStrain(torch.utils.data.Dataset):
         # define paths
         dataset_path = "/zhome/de/6/201864/Downloads/PVDefectsDS/"
         img_path = dataset_path + "/CellsImages/CellsGS/" + str(self.imgs_names[0]["namesAllCells"].values[idx][:5]) + "_" + str(self.imgs_names[0]["namesAllCells"].values[idx][5:12]) + "GS" + str(self.imgs_names[0]["namesAllCells"].values[idx][12:]) + ".png"
-        img_class = int(self.imgs_names[0]["nbDefAllCellsVH"].values[idx])
-        if img_class != 0:
+        number_of_labels = int(self.imgs_names[0]["nbDefAllCellsVH"].values[idx])
+        if number_of_labels != 0:
           row = self.labels[0].loc[self.labels[0]["namesCellsWF"] == self.imgs_names[0]["namesAllCells"].values[idx]]
           if row['nbCAVH'].values[0] > 0:
             img_class = torch.tensor(1, dtype=torch.uint8)
