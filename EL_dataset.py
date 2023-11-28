@@ -150,9 +150,9 @@ class PVDefectsDStrain(torch.utils.data.Dataset):
         img = torchvision.transforms.functional.resize(img, (300,300))
 
         image_name = self.imgs_names[0]["namesAllCells"].values[idx]
-        image_id = ''
-        for char in range(0, len(image_name)):
-          image_id += str(ord(image_name[char]))
+        image_id = hash(image_name)
+        #for char in range(0, len(image_name)):
+        #  image_id += str(ord(image_name[char]))
         image_id = image_id[:18]
         image_id = int(image_id)
         image_id = torch.tensor(image_id, dtype=torch.int64)
