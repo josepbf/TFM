@@ -175,6 +175,7 @@ class PVDefectsDStrain(torch.utils.data.Dataset):
 
               area = (xmax-xmin)*(ymax-ymin)
               bbox.append((xmin, ymin, xmax, ymax))
+              print(bbox)
               areas.append(area)
               labels.append(img_class)
           else:
