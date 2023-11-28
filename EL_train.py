@@ -24,7 +24,7 @@ parser = argparse.ArgumentParser(description="EL training",
 
 # Reproducibility and device configuration
 parser.add_argument("-D", "--deterministic", action='store_true', help="deterministic (slower)")
-parser.add_argument("-W", "--num_workers", type=int, default=2, help="number of workers in data loader")
+parser.add_argument("-W", "--num_workers", type=int, default=1, help="number of workers in data loader")
 parser.add_argument("-P", "--pin_memory", action='store_true', help="pin memory in data loader")
 parser.add_argument("--seed", type=int, default=0, help="random seed")
 

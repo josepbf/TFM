@@ -199,12 +199,13 @@ class PVDefectsDStrain(torch.utils.data.Dataset):
           target["iscrowd"] = iscrowd
 
         else:
+          print("Target is empty.")
           target = {}
-          target['boxes'] = torch.zeros(0,4)
-          target['labels'] = torch.zeros(0, dtype=torch.int64)
-          target['area'] = torch.zeros(0)
+          target['boxes'] = torch.empty(0,4)
+          target['labels'] = torch.empty(0, dtype=torch.int64)
+          target['area'] = torch.empty(0)
           target['image_id'] = torch.tensor(image_id, dtype=torch.int64)
-          target["iscrowd"] = torch.zeros(0)
+          target["iscrowd"] = torch.empty(0)
 
         if self.transforms is not None:
           img, target = self.transforms(img,target)
