@@ -203,7 +203,7 @@ class PVDefectsDStrain(torch.utils.data.Dataset):
           target["iscrowd"] = torch.zeros(0)
 
         if self.transforms is not None:
-            img = self.transforms(img)
+          img, target = self.transforms(img,target)
 
         return img, target
 
