@@ -11,6 +11,7 @@ import time
 from EL_models import Model
 from EL_dataset import PVDefectsDStrain, get_transform
 from EL_train_utils import train_one_epoch
+from EL_optim import Optimizer
 
 import argparse
 
