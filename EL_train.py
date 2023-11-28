@@ -113,7 +113,7 @@ trainloader = DataLoader(dataset_train, batch_size=batch_size, num_workers=num_w
 
 # Loss function 
 net_params = [p for p in net.parameters() if p.requires_grad]
-optimizer = Optimizer(net_params,
+optimizer_instance = Optimizer(net_params,
                 optim_name,
                 optim_default,
                 lr,
@@ -122,6 +122,7 @@ optimizer = Optimizer(net_params,
                 momentum,
                 dampening,
                 nesterov)   
+optimizer = optimizer_instance.get_optim()
 
 # Loss function
 criterion = nn.CrossEntropyLoss() #TODO generalize
