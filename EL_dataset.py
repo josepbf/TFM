@@ -4,7 +4,11 @@ from torch.utils.data import Dataset
 
 import torchvision.transforms as transforms
 import torchvision.transforms.functional as TF
+from torchvision.transforms import functional as F
 from torchvision import transforms as T
+from torchvision.transforms import GaussianBlur
+from torchvision.transforms import RandomEqualize
+from torchvision.transforms import ColorJitter
 
 import PIL
 from PIL import Image
@@ -18,7 +22,6 @@ import os
 
 from ast import literal_eval as make_tuple
 
-from torchvision import transforms as T
 
 # TODO Add more transformations for data augmentations from EL_training_utils
 
