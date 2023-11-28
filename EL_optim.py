@@ -10,7 +10,7 @@ class Optimizer:
                 weight_decay, # L2 penalty
                 momentum,
                 dampening,
-                nesterov)
+                nesterov):
         
         self.net_param = net_param
         self.optim_name = optim_name
