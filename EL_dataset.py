@@ -153,7 +153,7 @@ class PVDefectsDStrain(torch.utils.data.Dataset):
         image_id = str(hash(image_name))
         #for char in range(0, len(image_name)):
         #  image_id += str(ord(image_name[char]))
-        image_id = image_id[:18]
+        image_id = image_id[1:18]
         image_id = int(image_id)
         image_id = torch.tensor(image_id, dtype=torch.int64)
 
