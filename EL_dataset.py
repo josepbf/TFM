@@ -195,7 +195,7 @@ class PVDefectsDStrain(torch.utils.data.Dataset):
           bbox = torch.tensor(bbox, dtype=torch.float)
           areas = torch.tensor(areas, dtype=torch.int64)
           labels = torch.tensor(labels, dtype=torch.int64)
-          iscrowd = torch.zeros((len(mask_data['GTMaskVH'][:,:]),), dtype=torch.int64) # suppose all instances are not crowd
+          iscrowd = torch.zeros((len(number_of_boxes),), dtype=torch.int64) # suppose all instances are not crowd
 
           target = {}
           target['boxes'] = bbox
