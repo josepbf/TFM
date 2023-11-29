@@ -212,7 +212,7 @@ class PVDefectsDStrain(torch.utils.data.Dataset):
           bbox = torch.tensor(bbox, dtype=torch.float)
           target['boxes'] = bbox
           labels = []
-          labels.append(1)
+          labels.append(0)
           labels = torch.tensor(labels, dtype=torch.int64)
           target['labels'] = labels
           area = 300*300
