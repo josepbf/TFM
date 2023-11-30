@@ -203,7 +203,6 @@ class PVDefectsDStrain(torch.utils.data.Dataset):
           target["iscrowd"] = iscrowd
 
         else:
-          print("Target is empty.")
           target = {}
           bbox = []
           bbox.append((0, 0, 300, 300))
