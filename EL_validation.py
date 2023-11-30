@@ -9,7 +9,6 @@ import torch
 import collections
 from collections import defaultdict, deque
 
-import pycocotools
 from pycocotools import mask as maskUtils
 from pycocotools.coco import COCO
 

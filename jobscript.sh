@@ -26,11 +26,6 @@ nvidia-smi
 #module load cython/0.29.35-python-3.11.4
 #module load cuda
 
-#module load torch
-#module load torchvision
-#module load PIL
-#module load matplotlib
-
 source ../myVirtEnv/bin/activate
 
 python3 EL_train.py 
