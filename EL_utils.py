@@ -15,9 +15,11 @@ import torch.distributed as dist
 
 def compute_confusion_matrix_training(epoch, isValData = False, iou_threshold = 0.5):
   # Read all the names of outputs
+
   jsonPath = './FullTrainingDataset/Annotations'
   outputsPath = str('./outputs_faster_train_1/faster/outputs_epoch_' + str(epoch) + '_train/')
   targetsPath = './FullTrainingDataset/Annotations'
+  
 
   jsonNames = [f for f in listdir(jsonPath) if isfile(join(jsonPath, f))]
   outputNames = [f for f in listdir(outputsPath) if isfile(join(outputsPath, f))]
@@ -544,10 +546,6 @@ class MetricLogger(object):
     def __str__(self):
         loss_str = []
         for name, meter in self.meters.items():
-            print("name: asjdoasd")
-            print(name)
-            print("meter: asdoad")
-            print(meter)
             loss_str.append(
                 "{}: {}".format(name, str(meter))
             )

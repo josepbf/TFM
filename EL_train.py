@@ -11,7 +11,7 @@ import time
 from EL_models import Model
 from EL_dataset import PVDefectsDStrain, get_transform, collate_fn
 from EL_train_utils import train_one_epoch
-from EL_optim import Optimizer
+from EL_optim import Optimizer, compute_confusion_matrix_training
 
 import argparse
 
@@ -144,10 +144,10 @@ while epoch != epoch+num_epochs:
         
         # evaluate on the train dataset
         print("Starting train data evaluation...")
-        #evaluate_engine(model,train_data_loader_no_augmentation,device, epoch, isValData = False)
+        evaluate_engine(model,trainloader,device, epoch, isValData = False)
         
         # evaluate on the test dataset
-        print("Starting validation data evaluation...")
+        #print("Starting validation data evaluation...")
         #evaluate_engine(model,validation_data_loader,device, epoch, isValData = True)
 
         print("Computing confusion matrix training...")

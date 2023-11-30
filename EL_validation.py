@@ -4,17 +4,19 @@ import datetime
 import copy
 import numpy as np
 
+import torch
+
 import collections
 from collections import defaultdict, deque
 
 from pycocotools import mask as maskUtils
 from pycocotools.coco import COCO
 
-from EL_utils import MetricLogger, SmoothedValue
+from EL_utils import MetricLogger, SmoothedValue, reduce_dict
 
 def loss_one_epoch_val(model, optimizer, data_loader, device, epoch, print_freq, iteration):
     metric_logger = MetricLogger(delimiter="  ")
-    metric_logger.add_meter('lr', SmoothedValue(window_size=1, fmt='{value:.6f}'))
+    #metric_logger.add_meter('lr', SmoothedValue(window_size=1, fmt='{value:.6f}'))
     header = 'Epoch: [{}]'.format(epoch)
 
     for images, targets in metric_logger.log_every(data_loader, print_freq, epoch, header):
@@ -40,6 +42,7 @@ def loss_one_epoch_val(model, optimizer, data_loader, device, epoch, print_freq,
         loss_objectness = loss_dict_reduced['loss_objectness'].item()
         loss_rpn_box_reg = loss_dict_reduced['loss_rpn_box_reg'].item()
 
+        """
         writer_validation.add_scalar('Loss/loss', loss, iteration)
         writer_validation.add_scalar('Loss/loss_classifier', loss_classifier, iteration)
         writer_validation.add_scalar('Loss/loss_box_reg', loss_box_reg, iteration)
@@ -48,6 +51,7 @@ def loss_one_epoch_val(model, optimizer, data_loader, device, epoch, print_freq,
 
         metric_logger.update(loss=losses_reduced, **loss_dict_reduced)
         metric_logger.update(lr=optimizer.param_groups[0]["lr"])
+        """
 
 def _get_iou_types(model):
     model_without_ddp = model
@@ -75,7 +79,7 @@ def evaluate_engine(model, data_loader, device, epoch, isValData):
     coco_evaluator = CocoEvaluator(coco, iou_types, epoch)
 
     # directory save
-    
+    """
     if isValData:
       directory_name = str("outputs_epoch_" + str(epoch) + '_val')
       parent_dir = "./outputs_faster_train_1/faster"
@@ -88,7 +92,7 @@ def evaluate_engine(model, data_loader, device, epoch, isValData):
       path = os.path.join(parent_dir, directory_name)
       os.makedirs(path, exist_ok=True)
       output_directory_name = str('./outputs_faster_train_1/faster/outputs_epoch_' + str(epoch) + '_train' + '/')
-
+    """
 
     for image, targets in metric_logger.log_every(data_loader, 100, epoch, header):
         image = list(img.to(device) for img in image)
@@ -102,8 +106,8 @@ def evaluate_engine(model, data_loader, device, epoch, isValData):
         targets_copy = targets
         for i in range(len(outputs_to_save)):
           outputs_to_save[i]['image_id'] = targets_copy[i]['image_id']
-          output_name = str(output_directory_name + str(targets_copy[i]['image_id'].item()) + '.pt')
-          torch.save(outputs_to_save[i], output_name)
+          #output_name = str(output_directory_name + str(targets_copy[i]['image_id'].item()) + '.pt')
+          #torch.save(outputs_to_save[i], output_name)
 
         outputs = [{k: v.to(cpu_device) for k, v in t.items()} for t in outputs]
         model_time = time.time() - model_time
@@ -406,7 +410,7 @@ class CocoEvaluator(object):
             coco_eval.summarize()
       
             mAP_IoU_50_95, mAP_IoU_50, mAR_IoU_50_95 = coco_eval.summarize_mAP_mAR()
-
+            """
             if isValData:
                 writer_validation.add_scalar('Accuracy/mAP_IoU_50_95', mAP_IoU_50_95,epoch)
                 writer_validation.add_scalar('Accuracy/mAP_IoU_50', mAP_IoU_50,epoch)
@@ -414,7 +418,7 @@ class CocoEvaluator(object):
             else:
                 writer_training.add_scalar('Accuracy/mAP_IoU_50_95', mAP_IoU_50_95,epoch)
                 writer_training.add_scalar('Accuracy/mAP_IoU_50', mAP_IoU_50,epoch)
-                writer_training.add_scalar('Accuracy/mAR_IoU_50_95', mAR_IoU_50_95,epoch)
+                writer_training.add_scalar('Accuracy/mAR_IoU_50_95', mAR_IoU_50_95,epoch)"""
             
             
 
