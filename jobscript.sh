@@ -29,6 +29,7 @@ nvidia-smi
 #module load torchvision
 #module load PIL
 #module load matplotlib
+#module load cython
 
 source ../myVirtEnv/bin/activate
 
