@@ -19,17 +19,17 @@
 # -- end of LSF options --
 
 nvidia-smi
-# Load the cuda module
-#module load cuda/12.2.2
-#module load python3/3.11
-#module load numpy
-#module load pandas
+#module load gcc/13.1.0-binutils-2.40
+#module load gcc/12.3.0-binutils-2.40
+#module load sqlite3/3.42.0
+#module load python3/3.11.4
+#module load cython/0.29.35-python-3.11.4
+#module load cuda
 
 #module load torch
 #module load torchvision
 #module load PIL
 #module load matplotlib
-#module load cython
 
 source ../myVirtEnv/bin/activate
 
