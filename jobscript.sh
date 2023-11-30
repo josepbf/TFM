@@ -28,6 +28,6 @@ nvidia-smi
 
 source ../myVirtEnv/bin/activate
 
-python3 EL_train.py 
+/appl/python/3.11.4/bin/python3.11 EL_train.py 
 
 deactivate
