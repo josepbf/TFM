@@ -1,3 +1,6 @@
+import pycocotools
+print(pycocotools.__version__)
+
 import torch  
 import torch.nn as nn
 from torch.utils.data import DataLoader, WeightedRandomSampler 
@@ -146,7 +149,7 @@ while epoch != epoch+num_epochs:
         
         # evaluate on the train dataset
         print("Starting train data evaluation...")
-        evaluate_engine(model,trainloader,device, epoch, isValData = False)
+        evaluate_engine(net,trainloader,device, epoch, isValData = False)
         
         # evaluate on the test dataset
         #print("Starting validation data evaluation...")
