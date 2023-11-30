@@ -21,9 +21,9 @@
 nvidia-smi
 # Load the cuda module
 #module load cuda/12.2.2
-#module load python3/3.6.13
-#module load numpy/1.19.5-python-3.6.13-openblas-0.3.13
-#module load pandas/1.1.5-python-3.6.13
+#module load python3/3.11
+#module load numpy
+#module load pandas
 
 #module load torch
 #module load torchvision
