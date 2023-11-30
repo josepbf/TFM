@@ -11,7 +11,8 @@ import time
 from EL_models import Model
 from EL_dataset import PVDefectsDStrain, get_transform, collate_fn
 from EL_train_utils import train_one_epoch
-from EL_optim import Optimizer, compute_confusion_matrix_training
+from EL_utils import compute_confusion_matrix_training
+from EL_optim import Optimizer
 
 import argparse
 
