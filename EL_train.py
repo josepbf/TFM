@@ -1,6 +1,3 @@
-import pycocotools
-print(pycocotools.__version__)
-
 import torch  
 import torch.nn as nn
 from torch.utils.data import DataLoader, WeightedRandomSampler 
@@ -112,10 +109,11 @@ if seed != 0:
     torch.manual_seed(seed)
 
 # Create the custom dataset
-dataset_train = PVDefectsDStrain(get_transform(train=True)) #TODO train, validation, calibration, tests
+dataset = PVDefectsDStrain(get_transform(train=True)) #TODO train, validation, calibration, tests
 
 # Create a DataLoader for batching and shuffling the data
-trainloader = DataLoader(dataset_train, batch_size=batch_size, num_workers=num_workers, shuffle=True, collate_fn = collate_fn)
+trainloader = DataLoader(dataset, batch_size=batch_size, num_workers=num_workers, shuffle=True, collate_fn = collate_fn)
+#validationloader = DataLoader(dataset, batch_size=batch_size, num_workers=num_workers, shuffle=False, collate_fn = collate_fn)
 
 # Loss function 
 net_params = [p for p in net.parameters() if p.requires_grad]
