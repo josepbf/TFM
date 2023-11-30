@@ -13,7 +13,7 @@ from collections import defaultdict, deque
 from pycocotools import mask as maskUtils
 from pycocotools.coco import COCO
 
-from EL_utils import MetricLogger, SmoothedValue, reduce_dict
+from EL_utils import MetricLogger, SmoothedValue, reduce_dict, all_gather
 
 def loss_one_epoch_val(model, optimizer, data_loader, device, epoch, print_freq, iteration):
     metric_logger = MetricLogger(delimiter="  ")
