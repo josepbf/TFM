@@ -4,8 +4,8 @@ import datetime
 import copy
 import numpy as np
 import torchvision
-
 import torch
+import six
 
 import collections
 from collections import defaultdict, deque
@@ -250,7 +250,7 @@ def loadRes(self, resFile):
 
     # print('Loading and preparing results...')
     # tic = time.time()
-    if isinstance(resFile, torch._six.string_classes):
+    if isinstance(resFile, six.string_types):
         anns = json.load(open(resFile))
     elif type(resFile) == np.ndarray:
         anns = self.loadNumpyAnnotations(resFile)
