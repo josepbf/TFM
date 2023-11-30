@@ -140,7 +140,7 @@ while epoch != epoch+num_epochs:
     print("Starting training num." + str(epoch))
     # train for one epoch, printing every 10 iterations
     iteration = len(trainloader)*epoch
-    train_one_epoch(net, optimizer, trainloader, device, epoch, print_freq=1, iteration=iteration)
+    #train_one_epoch(net, optimizer, trainloader, device, epoch, print_freq=1, iteration=iteration)
     
     if epoch % 10 == 0 or epoch == 0:
         print("Starting evaluation num. " + str(epoch))

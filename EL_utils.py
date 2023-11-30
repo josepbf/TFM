@@ -3,6 +3,7 @@ import time
 import datetime
 import numpy as np
 import torch
+import torchvision
 
 import collections
 from collections import defaultdict, deque
