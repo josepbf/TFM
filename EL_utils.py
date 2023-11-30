@@ -506,8 +506,6 @@ class SmoothedValue(object):
 
     @property
     def max(self):
-        print("max(self): jasjdiads")
-        print(self.deque)
         return max(self.deque)
 
     @property
