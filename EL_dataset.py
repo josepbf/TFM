@@ -51,7 +51,7 @@ class OurGaussianNoise(object):
     def __call__(self, image, target):
       if random.random() < self.prob:
         std = np.random.uniform(self.minstd, self.maxstd)
-        image = im + torch.randn(im.size()) * std + self.mean
+        image = image + torch.randn(image.size()) * std + self.mean
       return image, target
 
 class OurRandomGamma(object):
