@@ -10,7 +10,8 @@ from torchvision import transforms as T
 from torchvision.transforms import GaussianBlur
 from torchvision.transforms import RandomEqualize
 from torchvision.transforms import ColorJitter
-
+from torchvision.transforms import RandomAdjustSharpness
+from torchvision.transforms import RandomErasing
 import scipy.io
 
 import PIL
@@ -26,12 +27,45 @@ import os
 
 from ast import literal_eval as make_tuple
 
-# TODO Add more transformations for data augmentations from EL_training_utils
+# TODO: Check this: https://pytorch.org/vision/main/transforms.html
 
 class ToTensor(object):
     def __call__(self, image, target):
         image = F.to_tensor(image)
         return image, target
+
+class OurRandomErasing(object):
+  def __init__(self, prob):
+    self.prob = prob
+  def __call__(self, image, target):
+    erasing = RandomErasing(prob)
+    image = erasing(image)
+    return image, target
+
+class OurGaussianNoise(object):
+    def __init__(self, prob):
+        self.minstd = 0.0
+        self.maxstd = 0.1
+        self.mean = 0
+        self.prob = prob
+    def __call__(self, image, target):
+      if random.random() < self.prob:
+        std = np.random.uniform(self.minstd, self.maxstd)
+        image = im + torch.randn(im.size()) * std + self.mean
+      return image, target
+
+class OurRandomGamma(object):
+    def __init__(self, prob):
+        self.prob = prob
+        mingamma = 2/3
+        maxgamma = 3/2
+        self.minloggamma = np.log(mingamma)
+        self.maxloggamma = np.log(maxgamma)
+    def __call__(self, image, target):
+      if random.random() < self.prob:
+        gamma = np.exp(np.random.uniform(self.minloggamma, self.maxloggamma))
+        image = TF.adjust_gamma(image, gamma=gamma)
+      return image, target
 
 class OurColorJitter(object):
     def __init__(self, prob):
@@ -39,7 +73,7 @@ class OurColorJitter(object):
 
     def __call__(self, image, target):
         if random.random() < self.prob:
-            jitter = ColorJitter(brightness=(0.3))
+            jitter = ColorJitter(brightness=0.25, contrast=0.25)
             image = jitter(image)
 
         return image, target
@@ -73,13 +107,18 @@ class RandomHorizontalFlip(object):
 class OurGaussianBlur(object):
     def __init__(self, prob):
         self.prob = prob
-
     def __call__(self, image, target):
         if random.random() < self.prob:
-            
-            blurfilter = GaussianBlur(kernel_size=(33,33),sigma=(5.0, 10.0))
+            blurfilter = GaussianBlur(kernel_size=5, sigma=(0.01,1.0))
             image = blurfilter(image)
+        return image, target
 
+class OurRandomAdjustSharpness(object):
+    def __init__(self, prob):
+        self.prob = prob
+    def __call__(self, image, target):
+        randomadjustsharpnessfilter = RandomAdjustSharpness(sharpness_factor=1.5, p=self.prob)
+        image = randomadjustsharpnessfilter(image)
         return image, target
 
 class Compose(object):
@@ -96,6 +135,10 @@ def get_transform(train):
     if train:
       transforms.append(OurGaussianBlur(0.125))
       transforms.append(OurColorJitter(0.125))
+      transforms.append(OurRandomAdjustSharpness(0.5))
+      transforms.append(OurRandomGamma(0.5))
+      transforms.append(OurGaussianNoise(0.5))
+      transform.append(OurRandomErasing(0.5))
     transforms.append(ToTensor())
     if train:
       transforms.append(RandomHorizontalFlip(0.5))
