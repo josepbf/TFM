@@ -36,8 +36,8 @@ parser.add_argument("-O", "--save_optim", action='store_true', help="save the op
 #parser.add_argument("name", help="Name to be saved")
 
 # Training param
-parser.add_argument("-e", "--num_epochs", type=int, default=1, help="number of epochs")
-parser.add_argument("-b", "--batch_size", type=int, default=11, help="batch size")
+parser.add_argument("-e", "--num_epochs", type=int, default=11, help="number of epochs")
+parser.add_argument("-b", "--batch_size", type=int, default=1, help="batch size")
 
 # Optimizer hyper-param
 parser.add_argument("--optim_name", type=str, default='Adam')
@@ -121,8 +121,18 @@ if seed != 0:
     torch.manual_seed(seed)
 
 # Create the custom dataset
-dataset = PVDefectsDStrain(get_transform(train=True)) #TODO train, validation, calibration, tests
 
+#generator = torch.Generator().manual_seed(42)
+dataset = PVDefectsDStrain(get_transform(train=True)) #TODO train, validation, calibration, tests
+#total_size = len(dataset)
+#train_size = int(0.7 * total_size)  # 70% for training
+#val_size = int(0.15 * total_size)   # 15% for validation
+#test_size = total_size - train_size - val_size  # Remaining for testing
+# Use random_split to split the dataset
+#train_dataset, validation_dataset, test_dataset = random_split(
+#    my_dataset,
+#    [train_size, val_size, test_size]
+#)
 # Create a DataLoader for batching and shuffling the data
 trainloader = DataLoader(dataset, batch_size=batch_size, num_workers=num_workers, shuffle=True, collate_fn = collate_fn)
 #validationloader = DataLoader(dataset, batch_size=batch_size, num_workers=num_workers, shuffle=False, collate_fn = collate_fn)
