@@ -37,7 +37,7 @@ parser.add_argument("-O", "--save_optim", action='store_true', help="save the op
 
 # Training param
 parser.add_argument("-e", "--num_epochs", type=int, default=1, help="number of epochs")
-parser.add_argument("-b", "--batch_size", type=int, default=1, help="batch size")
+parser.add_argument("-b", "--batch_size", type=int, default=11, help="batch size")
 
 # Optimizer hyper-param
 parser.add_argument("--optim_name", type=str, default='Adam')
@@ -154,7 +154,7 @@ while epoch != num_epochs:
     iteration = len(trainloader)*epoch
     train_one_epoch(net, optimizer, trainloader, device, epoch, print_freq=1, iteration=iteration)
     
-    if epoch % 10 == 0 or epoch == 0:
+    if epoch == 5 or epoch == 10:
         print("Starting evaluation num. " + str(epoch))
         
         # evaluate on the train dataset

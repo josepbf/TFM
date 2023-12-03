@@ -13,7 +13,7 @@ def train_one_epoch(model, optimizer, data_loader, device, epoch, print_freq, it
     for images, targets in metric_logger.log_every(data_loader, print_freq, epoch, header):
 
         iteration = iteration + 1
-        print("Iteration: " + str(iteration))
+        #print("Iteration: " + str(iteration))
         images = list(image.to(device) for image in images)
         targets = [{k: v.to(device) for k, v in t.items()} for t in targets]
 
