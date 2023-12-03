@@ -38,7 +38,7 @@ class OurRandomErasing(object):
   def __init__(self, prob):
     self.prob = prob
   def __call__(self, image, target):
-    erasing = RandomErasing(prob)
+    erasing = RandomErasing(self.prob)
     image = erasing(image)
     return image, target
 
