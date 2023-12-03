@@ -14,6 +14,13 @@ from os import listdir
 
 import torch.distributed as dist
 
+def int_to_boolean(value):
+  if value == 0:
+    value = False
+  if value == 1:
+    value = True
+  return value
+
 def compute_confusion_matrix_training(epoch, isValData = False, iou_threshold = 0.5):
   # Read all the names of outputs
 

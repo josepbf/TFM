@@ -11,7 +11,7 @@ import time
 from EL_models import Model
 from EL_dataset import PVDefectsDStrain, get_transform, collate_fn
 from EL_train_utils import train_one_epoch
-from EL_utils import compute_confusion_matrix_training
+from EL_utils import compute_confusion_matrix_training, int_to_boolean
 from EL_optim import Optimizer
 from EL_validation import evaluate_engine
 
@@ -49,6 +49,16 @@ parser.add_argument("-m ", "--momentum", type=float, default=0.9, help="momentum
 parser.add_argument("--dampening", type=float, default=0)
 parser.add_argument("--nesterov", type=int, default=0, help="0 is off, 1 is on")
 
+# Data augmentation
+parser.add_argument("--gaussian_blur", type=int, default=0, help="gaussian_blur")
+parser.add_argument("--color_jitter", type=int, default=0, help="color_jitter")
+parser.add_argument("--horizontal_flip", type=int, default=0, help="horizontal_flip")
+parser.add_argument("--vertical_flip", type=int, default=0, help="vertical_flip")
+parser.add_argument("--adjust_sharpness", type=int, default=0, help="adjust_sharpness")
+parser.add_argument("--random_gamma", type=int, default=0, help="random_gamma")
+parser.add_argument("--gaussian_noise", type=int, default=0, help="gaussian_noise")
+parser.add_argument("--random_erasing", type=int, default=0, help="random_erasing")
+
 # Model
 parser.add_argument("--model_name", type=str, default='FasterRCNN_ResNet-50-FPN')
 parser.add_argument("--trainable_backbone_layers", type=int, default=3)
@@ -77,26 +87,28 @@ pin_memory = config['pin_memory']
 
 # Optimizer hyper-parameters 
 optim_name = config['optim_name']
-optim_default = config['optim_default']
-if optim_default == 0:
-    optim_default = False
-if optim_default == 1:
-    optim_default = True
+optim_default = int_to_boolean(config['optim_default'])
 learning_rate = config['learning_rate']
 rho = config['rho']
 weight_decay = config['weight_decay']
 momentum = config['momentum']
 dampening = config['dampening']
-nesterov = config['nesterov']
-if nesterov == 0:
-    nesterov = False
-if nesterov == 1:
-    nesterov = True
+nesterov = int_to_boolean(config['nesterov'])
 
 # Hyper-parameters 
 num_epochs = config['num_epochs']
 batch_size = config['batch_size']
 #label_smoothing = config['label_smoothing']
+
+# Data Augmentation
+gaussian_blur = int_to_boolean(config['gaussian_blur'])
+color_jitter = int_to_boolean(config['color_jitter'])
+horizontal_flip = int_to_boolean(config['horizontal_flip'])
+vertical_flip = int_to_boolean(config['vertical_flip'])
+adjust_sharpness = int_to_boolean(config['adjust_sharpness'])
+random_gamma = int_to_boolean(config['random_gamma'])
+gaussian_noise = int_to_boolean(config['gaussian_noise'])
+random_erasing = int_to_boolean(config['random_erasing'])
 
 # Model name
 model_name = config['model_name']
@@ -134,13 +146,13 @@ criterion = nn.CrossEntropyLoss() #TODO generalize
 # Training
 epoch = 0
 iteration = 0
-while epoch != epoch+num_epochs:
+while epoch != num_epochs:
     # train for one epoch, printing every 10 iterations
 
     print("Starting training num." + str(epoch))
     # train for one epoch, printing every 10 iterations
     iteration = len(trainloader)*epoch
-    #train_one_epoch(net, optimizer, trainloader, device, epoch, print_freq=1, iteration=iteration)
+    train_one_epoch(net, optimizer, trainloader, device, epoch, print_freq=1, iteration=iteration)
     
     if epoch % 10 == 0 or epoch == 0:
         print("Starting evaluation num. " + str(epoch))
