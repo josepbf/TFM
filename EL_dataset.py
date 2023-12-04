@@ -176,17 +176,17 @@ class PVDefectsDS(torch.utils.data.Dataset):
         if train_val_test == 0:
           # Train
           for i in range(len(split_train_val_test_csv)):
-            if split_train_val_test_csv.at[i,train_val_test_split] == 0:
+            if split_train_val_test_csv.at[i,train_val_test] == 0:
               self.split_imgs_name.append(split_train_val_test_csv.at[i,name_image])
         elif train_val_test == 1:
           # Validation
           for i in range(len(self.split_train_val_test_csv)):
-            if split_train_val_test_csv.at[i,train_val_test_split] == 1:
+            if split_train_val_test_csv.at[i,train_val_test] == 1:
               self.split_imgs_name.append(split_train_val_test_csv.at[i,name_image])
         elif train_val_test == 2:
           # Test
           for i in range(len(self.split_train_val_test_csv)):
-            if split_train_val_test_csv.at[i,train_val_test_split] == 2:
+            if split_train_val_test_csv.at[i,train_val_test] == 2:
               self.split_imgs_name.append(split_train_val_test_csv.at[i,name_image])
 
     def __getitem__(self, idx):
