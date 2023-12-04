@@ -127,7 +127,7 @@ dataset_test = PVDefectsDS(get_transform(train=False), train_val_test = 2)
 
 trainloader = DataLoader(dataset_train, batch_size=batch_size, num_workers=num_workers, shuffle=True, collate_fn = collate_fn)
 validationloader = DataLoader(dataset_validation, batch_size=batch_size, num_workers=num_workers, shuffle=False, collate_fn = collate_fn)
-testloader = = DataLoader(dataset_test, batch_size=batch_size, num_workers=num_workers, shuffle=False, collate_fn = collate_fn)
+testloader = DataLoader(dataset_test, batch_size=batch_size, num_workers=num_workers, shuffle=False, collate_fn = collate_fn)
 
 # Loss function 
 net_params = [p for p in net.parameters() if p.requires_grad]
