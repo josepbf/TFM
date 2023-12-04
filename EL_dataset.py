@@ -148,31 +148,55 @@ def get_transform(train):
 def collate_fn(batch):
     return tuple(zip(*batch))
 
-class PVDefectsDStrain(torch.utils.data.Dataset):
-    def __init__(self, transforms):
+class PVDefectsDS(torch.utils.data.Dataset):
+    def __init__(self, transforms, train_val_test):
         self.transforms = transforms
         self.labels = list()
         self.imgs_names = list()
+        self.train_val_test = train_val_test
         
-        dataset_path = "/zhome/de/6/201864/Downloads/PVDefectsDS/"
-        annotationsPath = dataset_path + "namesDSVersionH_CorrAug2023.xlsx"
-        self.masks_path = dataset_path + 'MasksVersionH-CorrAugust2023/UpdateMasksSerie1/'
+        self.dataset_path = "/zhome/de/6/201864/Downloads/PVDefectsDS/"
+        annotationsPath = self.dataset_path + "namesDSVersionH_CorrAug2023.xlsx"
+        
+        self.masks_path = self.dataset_path + 'MasksVersionH-CorrAugust2023/UpdateMasksSerie1/'
         print("Loading dataset...")
-        self.imgs = list(sorted(os.listdir(os.path.join(dataset_path + "/CellsImages/CellsGS/"))))
 
         for i in range(12):
           if i%2 == 0:
             self.labels.append(pandas.read_excel(annotationsPath,i)[:-2])
           else:
             self.imgs_names.append(pandas.read_excel(annotationsPath,i)[:-2])
+        
+        self.imgs_names = pandas.concat(self.imgs_names, ignore_index=True)
+        self.labels = pandas.concat(self.labels, ignore_index=True)
+
+        split_train_val_test_csv = pandas.read_csv(self.dataset_path + 'split_train_val_test.csv')
+
+        self.split_imgs_name = []
+        if train_val_test == 0:
+          # Train
+          for i in range(len(split_train_val_test_csv)):
+            if split_train_val_test_csv.at[i,train_val_test_split] == 0:
+              self.split_imgs_name.append(split_train_val_test_csv.at[i,name_image])
+        elif train_val_test == 1:
+          # Validation
+          for i in range(len(self.split_train_val_test_csv)):
+            if split_train_val_test_csv.at[i,train_val_test_split] == 1:
+              self.split_imgs_name.append(split_train_val_test_csv.at[i,name_image])
+        elif train_val_test == 2:
+          # Test
+          for i in range(len(self.split_train_val_test_csv)):
+            if split_train_val_test_csv.at[i,train_val_test_split] == 2:
+              self.split_imgs_name.append(split_train_val_test_csv.at[i,name_image])
 
     def __getitem__(self, idx):
         # define paths
-        dataset_path = "/zhome/de/6/201864/Downloads/PVDefectsDS/"
-        img_path = dataset_path + "/CellsImages/CellsGS/" + str(self.imgs_names[0]["namesAllCells"].values[idx][:5]) + "_" + str(self.imgs_names[0]["namesAllCells"].values[idx][5:12]) + "GS" + str(self.imgs_names[0]["namesAllCells"].values[idx][12:]) + ".png"
-        number_of_labels = int(self.imgs_names[0]["nbDefAllCellsVH"].values[idx])
+        self.dataset_path = "/zhome/de/6/201864/Downloads/PVDefectsDS/"
+        img_path = self.dataset_path + "/CellsImages/CellsGS/" + str(self.split_imgs_name[idx][:5]) + "_" + str(self.split_imgs_name[idx][5:12]) + "GS" + str(self.split_imgs_name[idx][12:]) + ".png"
+        row_index = self.imgs_names[self.imgs_names["namesAllCells"] == split_imgs_name[idx]].index[0]
+        number_of_labels = int(self.imgs_names["nbDefAllCellsVH"].values[row_index])
         if number_of_labels != 0:
-          row = self.labels[0].loc[self.labels[0]["namesCellsWF"] == self.imgs_names[0]["namesAllCells"].values[idx]]
+          row = self.labels.loc[self.labels["namesCellsWF"] == self.split_imgs_name[idx]]
           if row['nbCAVH'].values[0] > 0:
             img_class = torch.tensor(1, dtype=torch.uint8)
           elif row['nbCBVH'].values[0] > 0:
@@ -183,7 +207,7 @@ class PVDefectsDStrain(torch.utils.data.Dataset):
             img_class = torch.tensor(4, dtype=torch.uint8)
           else:
             print("Image not labeled correctly")
-            print(self.imgs_names[0]["namesAllCells"])
+            print(self.imgs_names["namesAllCells"])
         else:
           img_class = torch.tensor(0, dtype=torch.uint8)
 
@@ -192,17 +216,15 @@ class PVDefectsDStrain(torch.utils.data.Dataset):
         original_size = img.size[::-1]
         img = torchvision.transforms.functional.resize(img, (300,300))
 
-        image_name = self.imgs_names[0]["namesAllCells"].values[idx]
+        image_name = self.split_imgs_name[idx]
         image_id = str(hash(image_name))
-        #for char in range(0, len(image_name)):
-        #  image_id += str(ord(image_name[char]))
         image_id = image_id[1:18]
         image_id = int(image_id)
         image_id = torch.tensor(image_id, dtype=torch.int64)
 
         if img_class != 0:
 
-          mask_data = scipy.io.loadmat(self.masks_path + "GT_" + str(self.imgs_names[0]["namesAllCells"].values[idx]) + ".mat")
+          mask_data = scipy.io.loadmat(self.masks_path + "GT_" + str(self.split_imgs_name[idx]) + ".mat")
           number_of_boxes = len(mask_data['GTLabelVH'])
           masks = mask_data['GTMaskVH']
           bbox = []
@@ -270,5 +292,4 @@ class PVDefectsDStrain(torch.utils.data.Dataset):
         return img, target
 
     def __len__(self):
-        return len(self.imgs_names[0])
-
+      return len(self.split_imgs_name)

@@ -9,7 +9,7 @@ import random
 import time
 
 from EL_models import Model
-from EL_dataset import PVDefectsDStrain, get_transform, collate_fn
+from EL_dataset import PVDefectsDS, get_transform, collate_fn
 from EL_train_utils import train_one_epoch
 from EL_utils import compute_confusion_matrix_training, int_to_boolean
 from EL_optim import Optimizer
@@ -120,22 +120,14 @@ net = net.to(device)
 if seed != 0:
     torch.manual_seed(seed)
 
-# Create the custom dataset
+# Dataset
+dataset_train = PVDefectsDS(get_transform(train=True), train_val_test = 0)
+dataset_validation = PVDefectsDS(get_transform(train=False), train_val_test = 1)
+dataset_test = PVDefectsDS(get_transform(train=False), train_val_test = 2)
 
-#generator = torch.Generator().manual_seed(42)
-dataset = PVDefectsDStrain(get_transform(train=True)) #TODO train, validation, calibration, tests
-#total_size = len(dataset)
-#train_size = int(0.7 * total_size)  # 70% for training
-#val_size = int(0.15 * total_size)   # 15% for validation
-#test_size = total_size - train_size - val_size  # Remaining for testing
-# Use random_split to split the dataset
-#train_dataset, validation_dataset, test_dataset = random_split(
-#    my_dataset,
-#    [train_size, val_size, test_size]
-#)
-# Create a DataLoader for batching and shuffling the data
-trainloader = DataLoader(dataset, batch_size=batch_size, num_workers=num_workers, shuffle=True, collate_fn = collate_fn)
-#validationloader = DataLoader(dataset, batch_size=batch_size, num_workers=num_workers, shuffle=False, collate_fn = collate_fn)
+trainloader = DataLoader(dataset_train, batch_size=batch_size, num_workers=num_workers, shuffle=True, collate_fn = collate_fn)
+validationloader = DataLoader(dataset_validation, batch_size=batch_size, num_workers=num_workers, shuffle=False, collate_fn = collate_fn)
+testloader = = DataLoader(dataset_test, batch_size=batch_size, num_workers=num_workers, shuffle=False, collate_fn = collate_fn)
 
 # Loss function 
 net_params = [p for p in net.parameters() if p.requires_grad]
