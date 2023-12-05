@@ -202,11 +202,11 @@ class PVDefectsDS(torch.utils.data.Dataset):
           if row['nbCAVH'].values[0] > 0:
             img_class = torch.tensor(1, dtype=torch.uint8)
           elif row['nbCBVH'].values[0] > 0:
-            img_class = torch.tensor(2, dtype=torch.uint8)
+            img_class = torch.tensor(1, dtype=torch.uint8)
           elif row['nbCCVH'].values[0] > 0:
-            img_class = torch.tensor(3, dtype=torch.uint8)
+            img_class = torch.tensor(2, dtype=torch.uint8)
           elif row['nbFFVH'].values[0] > 0:
-            img_class = torch.tensor(4, dtype=torch.uint8)
+            img_class = torch.tensor(3, dtype=torch.uint8)
           else:
             print("Image not labeled correctly")
             print(self.imgs_names["namesAllCells"])

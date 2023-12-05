@@ -156,6 +156,9 @@ writer_validation = Writer('',1)
 # Training
 epoch = 0
 iteration = 0
+now = datetime.now()
+dt_string = now.strftime("%d_%m_%Y_%H_%M_%S")
+
 while epoch != num_epochs:
     # train for one epoch, printing every 10 iterations
 
@@ -165,23 +168,21 @@ while epoch != num_epochs:
     train_one_epoch(net, optimizer, trainloader, device, epoch, print_freq=1, iteration=iteration, writer = writer_training)
     loss_one_epoch_val(net, optimizer, validation_data_loader, device, epoch, print_freq=1, iteration=iteration, writer = writer_validation)
 
-    now = datetime.now()
-    dt_string = now.strftime("%d_%m_%Y_%H_%M_%S")
-    name_to_save_outputs = str("./run_outputs_epoch_" + str(epoch) + dt_string + ".pth")
+    foldername_to_save_outputs = str("./run_outputs_epoch_" + dt_string + "/epoch_" + str(epoch))
     
     if epoch == 5 or epoch == 10:
         print("Starting evaluation num. " + str(epoch))
         
         # evaluate on the train dataset
         print("Starting train data evaluation...")
-        evaluate_engine(net,trainloader_no_augmentation,device, epoch, writer_training)
+        evaluate_engine(net,trainloader_no_augmentation,device, epoch, writer_training, foldername_to_save_outputs)
         
         # evaluate on the validation dataset
         print("Starting validation data evaluation...")
-        evaluate_engine(net,validationloader,device, epoch, writer_validation)
+        evaluate_engine(net,validationloader,device, epoch, writer_validation, foldername_to_save_outputs)
 
         print("Computing confusion matrix training...")
-        #compute_confusion_matrix_training(epoch, writer, iou_threshold = 0.5)
+        #compute_confusion_matrix_training(epoch, writer, iou_threshold = 0.5, foldername_to_save_outputs)
 
         print("Computing confusion matrix validation...")
         #compute_confusion_matrix_validation(epoch, iou_threshold = 0.5)
