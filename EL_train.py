@@ -124,7 +124,7 @@ if seed != 0:
 
 # Dataset
 dataset_train = PVDefectsDS(get_transform(train=True), train_val_test = 0)
-dataset_train_no_augmentation = MalariaDatasetTrain(get_transform(train=False), train_val_test = 0)
+dataset_train_no_augmentation = PVDefectsDS(get_transform(train=False), train_val_test = 0)
 dataset_validation = PVDefectsDS(get_transform(train=False), train_val_test = 1)
 dataset_test = PVDefectsDS(get_transform(train=False), train_val_test = 2)
 
