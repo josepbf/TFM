@@ -176,6 +176,7 @@ class PVDefectsDS(torch.utils.data.Dataset):
         print(split_train_val_test_csv.columns)
         if train_val_test == 0:
           # Train
+          
           for i in range(len(split_train_val_test_csv)):
             if split_train_val_test_csv.at[i,'train_val_test_split'] == 0:
               self.split_imgs_name.append(split_train_val_test_csv.at[i,"name_image"])
