@@ -7,13 +7,15 @@ import pandas as pd
 
 import random
 import time
+from datetime import datetime
 
 from EL_models import Model
 from EL_dataset import PVDefectsDS, get_transform, collate_fn
 from EL_train_utils import train_one_epoch
-from EL_utils import compute_confusion_matrix_training, int_to_boolean
+from EL_utils import int_to_boolean
 from EL_optim import Optimizer
-from EL_validation import evaluate_engine
+from EL_validation import evaluate_engine, loss_one_epoch_val, compute_confusion_matrix_training 
+from EL_metrics import Writer
 
 import argparse
 
@@ -26,7 +28,7 @@ parser = argparse.ArgumentParser(description="EL training",
 
 # Reproducibility and device configuration
 parser.add_argument("-D", "--deterministic", action='store_true', help="deterministic (slower)")
-parser.add_argument("-W", "--num_workers", type=int, default=1, help="number of workers in data loader")
+parser.add_argument("-W", "--num_workers", type=int, default=4, help="number of workers in data loader")
 parser.add_argument("-P", "--pin_memory", action='store_true', help="pin memory in data loader")
 parser.add_argument("--seed", type=int, default=0, help="random seed")
 
@@ -37,7 +39,7 @@ parser.add_argument("-O", "--save_optim", action='store_true', help="save the op
 
 # Training param
 parser.add_argument("-e", "--num_epochs", type=int, default=11, help="number of epochs")
-parser.add_argument("-b", "--batch_size", type=int, default=1, help="batch size")
+parser.add_argument("-b", "--batch_size", type=int, default=32, help="batch size")
 
 # Optimizer hyper-param
 parser.add_argument("--optim_name", type=str, default='Adam')
@@ -122,10 +124,12 @@ if seed != 0:
 
 # Dataset
 dataset_train = PVDefectsDS(get_transform(train=True), train_val_test = 0)
+dataset_train_no_augmentation = MalariaDatasetTrain(get_transform(train=False), train_val_test = 0)
 dataset_validation = PVDefectsDS(get_transform(train=False), train_val_test = 1)
 dataset_test = PVDefectsDS(get_transform(train=False), train_val_test = 2)
 
 trainloader = DataLoader(dataset_train, batch_size=batch_size, num_workers=num_workers, shuffle=True, collate_fn = collate_fn)
+trainloader_no_augmentation = DataLoader(dataset_train_no_augmentation, batch_size=batch_size, num_workers=num_workers, shuffle=False, collate_fn = collate_fn)
 validationloader = DataLoader(dataset_validation, batch_size=batch_size, num_workers=num_workers, shuffle=False, collate_fn = collate_fn)
 testloader = DataLoader(dataset_test, batch_size=batch_size, num_workers=num_workers, shuffle=False, collate_fn = collate_fn)
 
@@ -145,6 +149,10 @@ optimizer = optimizer_instance.get_optim()
 # Loss function
 criterion = nn.CrossEntropyLoss() #TODO generalize
 
+# Metrics
+writer_training = Writer('',0)
+writer_validation = Writer('',1)
+
 # Training
 epoch = 0
 iteration = 0
@@ -154,28 +162,33 @@ while epoch != num_epochs:
     print("Starting training num." + str(epoch))
     # train for one epoch, printing every 10 iterations
     iteration = len(trainloader)*epoch
-    train_one_epoch(net, optimizer, trainloader, device, epoch, print_freq=1, iteration=iteration)
+    train_one_epoch(net, optimizer, trainloader, device, epoch, print_freq=1, iteration=iteration, writer = writer_training)
+    loss_one_epoch_val(net, optimizer, validation_data_loader, device, epoch, print_freq=1, iteration=iteration, writer = writer_validation)
+
+    now = datetime.now()
+    dt_string = now.strftime("%d_%m_%Y_%H_%M_%S")
+    name_to_save_outputs = str("./run_outputs_epoch_" + str(epoch) + dt_string + ".pth")
     
     if epoch == 5 or epoch == 10:
         print("Starting evaluation num. " + str(epoch))
         
         # evaluate on the train dataset
         print("Starting train data evaluation...")
-        evaluate_engine(net,trainloader,device, epoch, isValData = False)
+        evaluate_engine(net,trainloader_no_augmentation,device, epoch, writer_training)
         
-        # evaluate on the test dataset
-        #print("Starting validation data evaluation...")
-        #evaluate_engine(model,validation_data_loader,device, epoch, isValData = True)
+        # evaluate on the validation dataset
+        print("Starting validation data evaluation...")
+        evaluate_engine(net,validationloader,device, epoch, writer_validation)
 
         print("Computing confusion matrix training...")
-        #compute_confusion_matrix_training(epoch, iou_threshold = 0.5)
+        #compute_confusion_matrix_training(epoch, writer, iou_threshold = 0.5)
 
         print("Computing confusion matrix validation...")
         #compute_confusion_matrix_validation(epoch, iou_threshold = 0.5)
 
         print("Saving the model...")
-        #model_name = str("./models_faster_1/model_epoch_" + str(epoch) + ".pth")
-        #torch.save(model, model_name)
+        #net_instance.save_model(net, epoch)
+        
     epoch += 1
         
 print("That's it!")

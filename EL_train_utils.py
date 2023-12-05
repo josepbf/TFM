@@ -4,7 +4,7 @@ import torch
 
 from EL_utils import MetricLogger, SmoothedValue, reduce_dict
 
-def train_one_epoch(model, optimizer, data_loader, device, epoch, print_freq, iteration):
+def train_one_epoch(model, optimizer, data_loader, device, epoch, print_freq, iteration, writer):
     model.train()
     metric_logger = MetricLogger(delimiter="  ")
     #metric_logger.add_meter('lr', SmoothedValue(window_size=1, fmt='{value:.6f}'))
@@ -33,14 +33,14 @@ def train_one_epoch(model, optimizer, data_loader, device, epoch, print_freq, it
         loss_objectness = loss_dict_reduced['loss_objectness'].item()
         loss_rpn_box_reg = loss_dict_reduced['loss_rpn_box_reg'].item()
 
-        #writer_training.add_scalar('Loss/loss', loss, iteration)
-        #writer_training.add_scalar('Loss/loss_classifier', loss_classifier, iteration)
-        #writer_training.add_scalar('Loss/loss_box_reg', loss_box_reg, iteration)
-        #writer_training.add_scalar('Loss/loss_objectness', loss_objectness, iteration)
-        #writer_training.add_scalar('Loss/loss_rpn_box_reg', loss_rpn_box_reg, iteration)
+        writer.store_metric('Loss/loss', loss, iteration)
+        writer.store_metric('Loss/loss_classifier', loss_classifier, iteration)
+        writer.store_metric('Loss/loss_box_reg', loss_box_reg, iteration)
+        writer.store_metric('Loss/loss_objectness', loss_objectness, iteration)
+        writer.store_metric('Loss/loss_rpn_box_reg', loss_rpn_box_reg, iteration)
         
         learning_rate = optimizer.param_groups[0]["lr"]
-        #writer_training.add_scalar('LearningRate/lr', learning_rate, iteration)
+        writer.store_metric('LearningRate/lr', learning_rate, iteration)
 
         if not math.isfinite(loss_value):
             print("Loss is {}, stopping training".format(loss_value))

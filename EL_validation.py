@@ -15,7 +15,7 @@ from pycocotools.coco import COCO
 
 from EL_utils import MetricLogger, SmoothedValue, reduce_dict, all_gather
 
-def loss_one_epoch_val(model, optimizer, data_loader, device, epoch, print_freq, iteration):
+def loss_one_epoch_val(model, optimizer, data_loader, device, epoch, print_freq, iteration, writer):
     metric_logger = MetricLogger(delimiter="  ")
     #metric_logger.add_meter('lr', SmoothedValue(window_size=1, fmt='{value:.6f}'))
     header = 'Epoch: [{}]'.format(epoch)
@@ -23,7 +23,7 @@ def loss_one_epoch_val(model, optimizer, data_loader, device, epoch, print_freq,
     for images, targets in metric_logger.log_every(data_loader, print_freq, epoch, header):
 
         iteration = iteration + 1
-        print("Iteration: " + str(iteration))
+        #print("Iteration: " + str(iteration))
         images = list(image.to(device) for image in images)
         targets = [{k: v.to(device) for k, v in t.items()} for t in targets]
 
@@ -43,16 +43,414 @@ def loss_one_epoch_val(model, optimizer, data_loader, device, epoch, print_freq,
         loss_objectness = loss_dict_reduced['loss_objectness'].item()
         loss_rpn_box_reg = loss_dict_reduced['loss_rpn_box_reg'].item()
 
-        """
-        writer_validation.add_scalar('Loss/loss', loss, iteration)
-        writer_validation.add_scalar('Loss/loss_classifier', loss_classifier, iteration)
-        writer_validation.add_scalar('Loss/loss_box_reg', loss_box_reg, iteration)
-        writer_validation.add_scalar('Loss/loss_objectness', loss_objectness, iteration)
-        writer_validation.add_scalar('Loss/loss_rpn_box_reg', loss_rpn_box_reg, iteration)
+        writer.store_metric('Loss/loss', loss, iteration)
+        writer.store_metric('Loss/loss_classifier', loss_classifier, iteration)
+        writer.store_metric('Loss/loss_box_reg', loss_box_reg, iteration)
+        writer.store_metric('Loss/loss_objectness', loss_objectness, iteration)
+        writer.store_metric('Loss/loss_rpn_box_reg', loss_rpn_box_reg, iteration)
 
-        metric_logger.update(loss=losses_reduced, **loss_dict_reduced)
-        metric_logger.update(lr=optimizer.param_groups[0]["lr"])
-        """
+        #metric_logger.update(loss=losses_reduced, **loss_dict_reduced)
+        #metric_logger.update(lr=optimizer.param_groups[0]["lr"])
+
+def compute_confusion_matrix_training(epoch, writer, iou_threshold = 0.5):
+  # Read all the names of outputs
+
+  jsonPath = './FullTrainingDataset/Annotations'
+  outputsPath = str('./outputs_faster_train_1/faster/outputs_epoch_' + str(epoch) + '_train/')
+  targetsPath = './FullTrainingDataset/Annotations'
+  
+
+  jsonNames = [f for f in listdir(jsonPath) if isfile(join(jsonPath, f))]
+  outputNames = [f for f in listdir(outputsPath) if isfile(join(outputsPath, f))]
+  jsonNames.sort()
+  outputNames.sort()
+
+  score_thresholds = [0.5,0.7,0.9]
+  for score_threshold in score_thresholds:
+    confusion_matrix = torch.zeros(4,4)
+    true_positive = 0
+    positive = 0
+    true = 0
+    # totes les outputs
+    for out_ind in range(len(outputNames)):
+
+      # Read the output
+      out = torch.load(str(outputsPath + '/' + outputNames[out_ind]))
+
+      # Read the targets
+      targetName = outputNames[out_ind]
+      targetName = targetName.replace("pt","json")
+      bbox_path = os.path.join("./FullTrainingDataset/Annotations", targetName)
+
+      tree = open(bbox_path,)
+      root = y = json.load(tree)
+      objects = root["annotations"]
+      bbox = []
+      labels = []
+      for obj in objects:
+        if obj["label"] == "Leukocyte" or obj["label"] == "Parasite":
+          xmin = int(obj["posX"])
+          ymin = int(obj["posY"])
+          xmax = xmin + int(obj["width"])
+          ymax = ymin + int(obj["height"])
+          bbox.append((xmin, ymin, xmax, ymax))
+
+        if obj["label"] == "Leukocyte":
+          labels.append(1)
+        if obj["label"] == "Parasite":
+          if obj["disease"] != "+malaria mature trophozoite plasmodium spp":
+            labels.append(2)
+          elif obj["disease"] == "+malaria mature trophozoite plasmodium spp":
+            labels.append(3)
+        
+      ground_truth_boxes = torch.tensor(bbox, dtype=torch.float)
+      ground_truth_labels = torch.tensor(labels, dtype=torch.int64)
+
+      # Compute the confusion matrix for that image
+
+      # 1 Discard detections with IoU greater or equal than 0.5 Keep the highest score
+      detected_boxes = out['boxes']
+      detected_scores = out['scores']
+      detected_labels = out['labels']
+      indices = torchvision.ops.batched_nms(boxes = detected_boxes, scores = detected_scores, idxs = detected_labels, iou_threshold = iou_threshold)
+
+      boxes = []
+      scores = []
+      labels = []
+      for indice in indices:
+        boxes.append(detected_boxes[indice])
+        scores.append(detected_scores[indice])
+        labels.append(detected_labels[indice])
+
+      detected_boxes_prefilter = boxes
+      detected_scores_prefilter = scores
+      detected_labels_prefilter = labels
+
+      # 2 Only detections with a score greater or equal than 0.5 are considered. Anything that’s under this value is discarded.
+      # SCORE THRESHOLD IS A PARAM
+      boxes = []
+      scores = []
+      labels = []
+      for i in range(len(indices)):
+        if detected_scores_prefilter[i] > score_threshold:
+          boxes.append(detected_boxes_prefilter[i])
+          scores.append(detected_scores_prefilter[i])
+          labels.append(detected_labels_prefilter[i])
+
+      detected_boxes = boxes
+      detected_scores = scores
+      detected_labels = labels
+
+      # 3 For each ground-truth box, the algorithm generates the IoU (Intersection over Union) with every detected box. 
+      # A match is found if both boxes have an IoU greater or equal than 0.5.
+      # IoU IS A PARAM
+      boxes = []
+      for detected_box in detected_boxes:
+        boxes.append(torch.trunc(detected_box))
+
+      detected_boxes = boxes
+
+      boxes = []
+      for detected_box in detected_boxes:
+        xmin = detected_box[0].item()
+        ymin = detected_box[1].item()
+        xmax = detected_box[2].item()
+        ymax = detected_box[3].item()
+        boxes.append((xmin, ymin, xmax, ymax))
+
+      detected_boxes = torch.tensor(boxes, dtype=torch.float)
+
+      # no detections
+      if len(detected_boxes) == 0:
+        for m in range(len(ground_truth_labels)):
+          confusion_matrix[ground_truth_labels[m],0] += 1
+
+      # no ground truth
+      if len(ground_truth_boxes) == 0:
+        for m in range(len(detected_labels)):
+          confusion_matrix[0,detected_labels[m]] += 1
+
+      # detection and ground truth
+      if len(ground_truth_boxes) != 0 and len(detected_boxes) != 0:
+        iou = torchvision.ops.box_iou(boxes1 = ground_truth_boxes, boxes2 = detected_boxes)
+
+        # 4 The list of matches is pruned to remove duplicates (ground-truth boxes that match with more than one detection box 
+        # or vice versa). If there are duplicates, the best match (greater IoU) is always selected.
+        detection_results = np.zeros(len(detected_boxes))
+        ground_truth_results = np.zeros(len(ground_truth_boxes))
+        
+        for n in range(len(iou)):
+          for m in range(len(iou[0])):
+            if iou[n,m] >= iou_threshold:
+              index_detection = torch.argmax(input = iou[n], dim=None, keepdim=False) # Aquesta es l'index de la detecció
+              index_ground_truth = n # Aquest es l'index del ground truth
+              
+              # Només comptar ground_truth_results quan la detecció en questió encara no te resultat assignat
+              if detection_results[index_detection] == 0:
+                ground_truth_results[index_ground_truth] += 1
+              detection_results[index_detection] += 1
+              
+              if detection_results[index_detection] == 1 and ground_truth_results[index_ground_truth] == 1:
+                confusion_matrix[ground_truth_labels[index_ground_truth],detected_labels[index_detection]] += 1
+
+        # 5 The confusion matrix is updated to reflect the resulting matches between ground-truth and detections.
+
+        # 6 Objects that are part of the ground-truth but weren’t detected are counted in the last column of the matrix
+        # (in the row corresponding to the ground-truth class). Objects that were detected but aren’t part of the confusion 
+        # matrix are counted in the last row of the matrix (in the column corresponding to the detected class).
+        for index_detection in range(len(detection_results)):
+          if detection_results[index_detection] == 0:
+            confusion_matrix[0,detected_labels[index_detection]] += 1
+
+        for index_ground_truth in range(len(ground_truth_results)):
+          if ground_truth_results[index_ground_truth] == 0:
+            confusion_matrix[ground_truth_labels[index_ground_truth],0] += 1
+            
+      if out_ind == len(outputNames)-1 :
+        print("Confunsion Matrix completed:")
+        print("Score = " + str(score_threshold))
+        print(confusion_matrix)
+
+        true_positive = confusion_matrix[1,1] + confusion_matrix[2,2] + confusion_matrix[3,3]
+        positive = true_positive + confusion_matrix[1,2] +confusion_matrix[1,3] + confusion_matrix[2,1] + confusion_matrix[2,3] +confusion_matrix[3,1] + confusion_matrix[3,2] +confusion_matrix[0,1]+confusion_matrix[0,2]+confusion_matrix[0,3]
+        true = true_positive + confusion_matrix[1,2] +confusion_matrix[1,3] + confusion_matrix[2,1] + confusion_matrix[2,3] +confusion_matrix[3,1] + confusion_matrix[3,2] + confusion_matrix[1,0]+confusion_matrix[2,0]+confusion_matrix[3,0]
+
+        if positive>0 and true>0:
+          if score_threshold == 0.5:
+            score_name = '50'
+            precision_50 = true_positive / positive
+            recall_50 = true_positive / true
+            fmeasure_50 = 2*(precision_50*recall_50)/(precision_50+recall_50)
+            print("Precision (score = 50): " + str(precision_50))
+            print("Recall (score = 50): " + str(recall_50))
+            print("Fmeasure (score = 50): " + str(fmeasure_50))
+            writer.store_metric('ConfusionMatrix/precision_0.5_score', precision_50, epoch)
+            writer.store_metric('ConfusionMatrix/recall_0.5_score', recall_50, epoch)
+            writer.store_metric('ConfusionMatrix/fmeasure_0.5_score', fmeasure_50, epoch)
+          if score_threshold == 0.7:
+            score_name = '70'
+            precision_70 = true_positive / positive
+            recall_70 = true_positive / true
+            fmeasure_70 = 2*(precision_70*recall_70)/(precision_70+recall_70)
+            print("Precision (score = 70): " + str(precision_70))
+            print("Recall (score = 70): " + str(recall_70))
+            print("Fmeasure (score = 70): " + str(fmeasure_70))
+            writer.store_metric('ConfusionMatrix/precision_0.7_score', precision_70, epoch)
+            writer.store_metric('ConfusionMatrix/recall_0.7_score', recall_70, epoch)
+            writer.store_metric('ConfusionMatrix/fmeasure_0.7_score', fmeasure_70, epoch)
+          if score_threshold == 0.9:
+            score_name = '90'        
+            precision_90 = true_positive / positive
+            recall_90 = true_positive / true
+            fmeasure_90 = 2*(precision_90*recall_90)/(precision_90+recall_90)  
+            print("Precision (score = 90): " + str(precision_90))
+            print("Recall (score = 90): " + str(recall_90))
+            print("Fmeasure (score = 90): " + str(fmeasure_90))
+            writer.store_metric('ConfusionMatrix/precision_0.9_score', precision_90, epoch)
+            writer.store_metric('ConfusionMatrix/recall_0.9_score', recall_90, epoch)
+            writer.store_metric('ConfusionMatrix/fmeasure_0.9_score', fmeasure_90, epoch)
+        # Store confusion matrix image
+        writer.store_matrix('ConfusionMatrix/matrix', confusion_matrix, epoch)    
+
+
+def compute_confusion_matrix_validation(epoch, isValData = False, iou_threshold = 0.5):
+  # Read all the names of outputs
+  jsonPath = './FullValidationDataset/Annotations'
+  outputsPath = str('./outputs_faster_train_1/faster/outputs_epoch_' + str(epoch) + '_val/')
+  targetsPath = './FullValidationDataset/Annotations'
+
+  jsonNames = [f for f in listdir(jsonPath) if isfile(join(jsonPath, f))]
+  outputNames = [f for f in listdir(outputsPath) if isfile(join(outputsPath, f))]
+  jsonNames.sort()
+  outputNames.sort()
+
+  score_thresholds = [0.5,0.7,0.9]
+  for score_threshold in score_thresholds:
+    confusion_matrix = torch.zeros(4,4)
+    true_positive = 0
+    positive = 0
+    true = 0
+    # totes les outputs
+    for out_ind in range(len(outputNames)):
+
+      # Read the output
+      out = torch.load(str(outputsPath + '/' + outputNames[out_ind]))
+
+      # Read the targets
+      targetName = outputNames[out_ind]
+      targetName = targetName.replace("pt","json")
+      bbox_path = os.path.join("./FullValidationDataset/Annotations", targetName)
+
+      tree = open(bbox_path,)
+      root = y = json.load(tree)
+      objects = root["annotations"]
+      bbox = []
+      labels = []
+      for obj in objects:
+        if obj["label"] == "Leukocyte" or obj["label"] == "Parasite":
+          xmin = int(obj["posX"])
+          ymin = int(obj["posY"])
+          xmax = xmin + int(obj["width"])
+          ymax = ymin + int(obj["height"])
+          bbox.append((xmin, ymin, xmax, ymax))
+
+        if obj["label"] == "Leukocyte":
+          labels.append(1)
+        if obj["label"] == "Parasite":
+          if obj["disease"] != "+malaria mature trophozoite plasmodium spp":
+            labels.append(2)
+          elif obj["disease"] == "+malaria mature trophozoite plasmodium spp":
+            labels.append(3)
+        
+      ground_truth_boxes = torch.tensor(bbox, dtype=torch.float)
+      ground_truth_labels = torch.tensor(labels, dtype=torch.int64)
+
+      # Compute the confusion matrix for that image
+
+      # 1 Discard detections with IoU greater or equal than 0.5 Keep the highest score
+      detected_boxes = out['boxes']
+      detected_scores = out['scores']
+      detected_labels = out['labels']
+      indices = torchvision.ops.batched_nms(boxes = detected_boxes, scores = detected_scores, idxs = detected_labels, iou_threshold = iou_threshold)
+
+      boxes = []
+      scores = []
+      labels = []
+      for indice in indices:
+        boxes.append(detected_boxes[indice])
+        scores.append(detected_scores[indice])
+        labels.append(detected_labels[indice])
+
+      detected_boxes_prefilter = boxes
+      detected_scores_prefilter = scores
+      detected_labels_prefilter = labels
+
+      # 2 Only detections with a score greater or equal than 0.5 are considered. Anything that’s under this value is discarded.
+      # SCORE THRESHOLD IS A PARAM
+      boxes = []
+      scores = []
+      labels = []
+      for i in range(len(indices)):
+        if detected_scores_prefilter[i] > score_threshold:
+          boxes.append(detected_boxes_prefilter[i])
+          scores.append(detected_scores_prefilter[i])
+          labels.append(detected_labels_prefilter[i])
+
+      detected_boxes = boxes
+      detected_scores = scores
+      detected_labels = labels
+
+      # 3 For each ground-truth box, the algorithm generates the IoU (Intersection over Union) with every detected box. 
+      # A match is found if both boxes have an IoU greater or equal than 0.5.
+      # IoU IS A PARAM
+      boxes = []
+      for detected_box in detected_boxes:
+        boxes.append(torch.trunc(detected_box))
+
+      detected_boxes = boxes
+
+      boxes = []
+      for detected_box in detected_boxes:
+        xmin = detected_box[0].item()
+        ymin = detected_box[1].item()
+        xmax = detected_box[2].item()
+        ymax = detected_box[3].item()
+        boxes.append((xmin, ymin, xmax, ymax))
+
+      detected_boxes = torch.tensor(boxes, dtype=torch.float)
+
+      # no detections
+      if len(detected_boxes) == 0:
+        for m in range(len(ground_truth_labels)):
+          confusion_matrix[ground_truth_labels[m],0] += 1
+
+      # no ground truth
+      if len(ground_truth_boxes) == 0:
+        for m in range(len(detected_labels)):
+          confusion_matrix[0,detected_labels[m]] += 1
+
+      # detection and ground truth
+      if len(ground_truth_boxes) != 0 and len(detected_boxes) != 0:
+        iou = torchvision.ops.box_iou(boxes1 = ground_truth_boxes, boxes2 = detected_boxes)
+
+        # 4 The list of matches is pruned to remove duplicates (ground-truth boxes that match with more than one detection box 
+        # or vice versa). If there are duplicates, the best match (greater IoU) is always selected.
+        detection_results = np.zeros(len(detected_boxes))
+        ground_truth_results = np.zeros(len(ground_truth_boxes))
+        
+        for n in range(len(iou)):
+          for m in range(len(iou[0])):
+            if iou[n,m] >= iou_threshold:
+              index_detection = torch.argmax(input = iou[n], dim=None, keepdim=False) # Aquesta es l'index de la detecció
+              index_ground_truth = n # Aquest es l'index del ground truth
+              
+              # Només comptar ground_truth_results quan la detecció en questió encara no te resultat assignat
+              if detection_results[index_detection] == 0:
+                ground_truth_results[index_ground_truth] += 1
+              detection_results[index_detection] += 1
+              
+              if detection_results[index_detection] == 1 and ground_truth_results[index_ground_truth] == 1:
+                confusion_matrix[ground_truth_labels[index_ground_truth],detected_labels[index_detection]] += 1
+
+        # 5 The confusion matrix is updated to reflect the resulting matches between ground-truth and detections.
+
+        # 6 Objects that are part of the ground-truth but weren’t detected are counted in the last column of the matrix
+        # (in the row corresponding to the ground-truth class). Objects that were detected but aren’t part of the confusion 
+        # matrix are counted in the last row of the matrix (in the column corresponding to the detected class).
+        for index_detection in range(len(detection_results)):
+          if detection_results[index_detection] == 0:
+            confusion_matrix[0,detected_labels[index_detection]] += 1
+
+        for index_ground_truth in range(len(ground_truth_results)):
+          if ground_truth_results[index_ground_truth] == 0:
+            confusion_matrix[ground_truth_labels[index_ground_truth],0] += 1
+            
+      if out_ind == len(outputNames)-1 :
+        print("Confunsion Matrix completed:")
+        print("Score = " + str(score_threshold))
+        print(confusion_matrix)
+
+        true_positive = confusion_matrix[1,1] + confusion_matrix[2,2] + confusion_matrix[3,3]
+        positive = true_positive + confusion_matrix[1,2] +confusion_matrix[1,3] + confusion_matrix[2,1] + confusion_matrix[2,3] +confusion_matrix[3,1] + confusion_matrix[3,2] +confusion_matrix[0,1]+confusion_matrix[0,2]+confusion_matrix[0,3]
+        true = true_positive + confusion_matrix[1,2] +confusion_matrix[1,3] + confusion_matrix[2,1] + confusion_matrix[2,3] +confusion_matrix[3,1] + confusion_matrix[3,2] + confusion_matrix[1,0]+confusion_matrix[2,0]+confusion_matrix[3,0]
+
+        if positive>0 and true>0:
+          if score_threshold == 0.5:
+            score_name = '50'
+            precision_50 = true_positive / positive
+            recall_50 = true_positive / true
+            fmeasure_50 = 2*(precision_50*recall_50)/(precision_50+recall_50)
+            print("Precision (score = 50): " + str(precision_50))
+            print("Recall (score = 50): " + str(recall_50))
+            print("Fmeasure (score = 50): " + str(fmeasure_50))
+            writer_validation.add_scalar('ConfusionMatrix/precision_0.5_score', precision_50, epoch)
+            writer_validation.add_scalar('ConfusionMatrix/recall_0.5_score', recall_50, epoch)
+            writer_validation.add_scalar('ConfusionMatrix/fmeasure_0.5_score', fmeasure_50, epoch)
+          if score_threshold == 0.7:
+            score_name = '70'
+            precision_70 = true_positive / positive
+            recall_70 = true_positive / true
+            fmeasure_70 = 2*(precision_70*recall_70)/(precision_70+recall_70)
+            print("Precision (score = 70): " + str(precision_70))
+            print("Recall (score = 70): " + str(recall_70))
+            print("Fmeasure (score = 70): " + str(fmeasure_70))
+            writer_validation.add_scalar('ConfusionMatrix/precision_0.7_score', precision_70, epoch)
+            writer_validation.add_scalar('ConfusionMatrix/recall_0.7_score', recall_70, epoch)
+            writer_validation.add_scalar('ConfusionMatrix/fmeasure_0.7_score', fmeasure_70, epoch)
+          if score_threshold == 0.9:
+            score_name = '90'        
+            precision_90 = true_positive / positive
+            recall_90 = true_positive / true
+            fmeasure_90 = 2*(precision_90*recall_90)/(precision_90+recall_90)  
+            print("Precision (score = 90): " + str(precision_90))
+            print("Recall (score = 90): " + str(recall_90))
+            print("Fmeasure (score = 90): " + str(fmeasure_90))
+            writer_validation.add_scalar('ConfusionMatrix/precision_0.9_score', precision_90, epoch)
+            writer_validation.add_scalar('ConfusionMatrix/recall_0.9_score', recall_90, epoch)
+            writer_validation.add_scalar('ConfusionMatrix/fmeasure_0.9_score', fmeasure_90, epoch)
+        # Store confusion matrix image
+        matrix_name = str('./confusions_matrix_faster_train_1/faster/validation/confusion_matrix_epoch_' + str(epoch) + '_score_' + score_name + '.pt')
+        torch.save(confusion_matrix, matrix_name)    
 
 def _get_iou_types(model):
     model_without_ddp = model
@@ -66,7 +464,7 @@ def _get_iou_types(model):
     return iou_types
 
 @torch.no_grad()
-def evaluate_engine(model, data_loader, device, epoch, isValData):
+def evaluate_engine(model, data_loader, device, epoch, writer):
     n_threads = torch.get_num_threads()
     # FIXME remove this and make paste_masks_in_image run on the GPU
     torch.set_num_threads(1)
@@ -80,20 +478,18 @@ def evaluate_engine(model, data_loader, device, epoch, isValData):
     coco_evaluator = CocoEvaluator(coco, iou_types, epoch)
 
     # directory save
-    """
-    if isValData:
-      directory_name = str("outputs_epoch_" + str(epoch) + '_val')
-      parent_dir = "./outputs_faster_train_1/faster"
-      path = os.path.join(parent_dir, directory_name)
-      os.makedirs(path, exist_ok=True)
-      output_directory_name = str('./outputs_faster_train_1/faster/outputs_epoch_' + str(epoch) + '_val' + '/')
-    else:      
-      directory_name = str("outputs_epoch_" + str(epoch) + '_train')
-      parent_dir = "./outputs_faster_train_1/faster"
-      path = os.path.join(parent_dir, directory_name)
-      os.makedirs(path, exist_ok=True)
-      output_directory_name = str('./outputs_faster_train_1/faster/outputs_epoch_' + str(epoch) + '_train' + '/')
-    """
+    #if isValData:
+      #directory_name = str("outputs_epoch_" + str(epoch) + '_val')
+      #parent_dir = "./outputs_faster_train_1/faster"
+      #path = os.path.join(parent_dir, directory_name)
+      #os.makedirs(path, exist_ok=True)
+      #output_directory_name = str('./outputs_faster_train_1/faster/outputs_epoch_' + str(epoch) + '_val' + '/')
+    #else:      
+      #directory_name = str("outputs_epoch_" + str(epoch) + '_train')
+      #parent_dir = "./outputs_faster_train_1/faster"
+      #path = os.path.join(parent_dir, directory_name)
+      #os.makedirs(path, exist_ok=True)
+      #output_directory_name = str('./outputs_faster_train_1/faster/outputs_epoch_' + str(epoch) + '_train' + '/')
 
     for image, targets in metric_logger.log_every(data_loader, 100, epoch, header):
         image = list(img.to(device) for img in image)
@@ -103,10 +499,10 @@ def evaluate_engine(model, data_loader, device, epoch, isValData):
         model_time = time.time()
         outputs = model(image)
 
-        outputs_to_save = outputs
-        targets_copy = targets
-        for i in range(len(outputs_to_save)):
-          outputs_to_save[i]['image_id'] = targets_copy[i]['image_id']
+        #outputs_to_save = outputs
+        #targets_copy = targets
+        #for i in range(len(outputs_to_save)):
+          #outputs_to_save[i]['image_id'] = targets_copy[i]['image_id']
           #output_name = str(output_directory_name + str(targets_copy[i]['image_id'].item()) + '.pt')
           #torch.save(outputs_to_save[i], output_name)
 
@@ -126,7 +522,7 @@ def evaluate_engine(model, data_loader, device, epoch, isValData):
 
     # accumulate predictions from all images
     coco_evaluator.accumulate()
-    coco_evaluator.summarize(epoch, isValData)
+    coco_evaluator.summarize(epoch, writer)
     torch.set_num_threads(n_threads)
     return coco_evaluator
 
@@ -404,26 +800,17 @@ class CocoEvaluator(object):
         for coco_eval in self.coco_eval.values():
             coco_eval.accumulate()
 
-    def summarize(self, epoch, isValData):
+    def summarize(self, epoch, writer):
         for iou_type, coco_eval in self.coco_eval.items():
             print("IoU metric: {}".format(iou_type))
             
             coco_eval.summarize()
       
             mAP_IoU_50_95, mAP_IoU_50, mAR_IoU_50_95 = coco_eval.summarize_mAP_mAR()
-            """
-            if isValData:
-                writer_validation.add_scalar('Accuracy/mAP_IoU_50_95', mAP_IoU_50_95,epoch)
-                writer_validation.add_scalar('Accuracy/mAP_IoU_50', mAP_IoU_50,epoch)
-                writer_validation.add_scalar('Accuracy/mAR_IoU_50_95', mAR_IoU_50_95,epoch)
-            else:
-                writer_training.add_scalar('Accuracy/mAP_IoU_50_95', mAP_IoU_50_95,epoch)
-                writer_training.add_scalar('Accuracy/mAP_IoU_50', mAP_IoU_50,epoch)
-                writer_training.add_scalar('Accuracy/mAR_IoU_50_95', mAR_IoU_50_95,epoch)"""
             
-            
-
-
+            writer.store_metric('Accuracy/mAP_IoU_50_95', mAP_IoU_50_95,epoch)
+            writer.store_metric('Accuracy/mAP_IoU_50', mAP_IoU_50,epoch)
+            writer.store_metric('Accuracy/mAR_IoU_50_95', mAR_IoU_50_95,epoch)
 
     def prepare(self, predictions, iou_type):
         if iou_type == "bbox":
