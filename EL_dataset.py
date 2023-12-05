@@ -176,7 +176,7 @@ class PVDefectsDS(torch.utils.data.Dataset):
         print(split_train_val_test_csv.columns)
         if train_val_test == 0:
           # Train
-          
+
           for i in range(len(split_train_val_test_csv)):
             if split_train_val_test_csv.at[i,'train_val_test_split'] == 0:
               self.split_imgs_name.append(split_train_val_test_csv.at[i,"name_image"])
@@ -195,7 +195,7 @@ class PVDefectsDS(torch.utils.data.Dataset):
         # define paths
         self.dataset_path = "/zhome/de/6/201864/Downloads/PVDefectsDS/"
         img_path = self.dataset_path + "/CellsImages/CellsGS/" + str(self.split_imgs_name[idx][:5]) + "_" + str(self.split_imgs_name[idx][5:12]) + "GS" + str(self.split_imgs_name[idx][12:]) + ".png"
-        row_index = self.imgs_names[self.imgs_names["namesAllCells"] == split_imgs_name[idx]].index[0]
+        row_index = self.imgs_names[self.imgs_names["namesAllCells"] == self.split_imgs_name[idx]].index[0]
         number_of_labels = int(self.imgs_names["nbDefAllCellsVH"].values[row_index])
         if number_of_labels != 0:
           row = self.labels.loc[self.labels["namesCellsWF"] == self.split_imgs_name[idx]]
