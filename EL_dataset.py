@@ -158,7 +158,7 @@ class PVDefectsDS(torch.utils.data.Dataset):
         self.dataset_path = "/zhome/de/6/201864/Downloads/PVDefectsDS/"
         annotationsPath = self.dataset_path + "namesDSVersionH_CorrAug2023.xlsx"
         
-        self.masks_path = self.dataset_path + 'MasksVersionH-CorrAugust2023/UpdateMasksSerie1/'
+        self.masks_path = self.dataset_path + 'MasksVersionH-CorrAugust2023/'
         print("Loading dataset...")
 
         for i in range(12):
