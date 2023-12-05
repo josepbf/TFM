@@ -21,8 +21,12 @@ class Writer:
    def store_metric(metric_name, scalar, step):
       self.writer.add_scalar(metric_name, scalar, step)
    
+   def get_train_or_val():
+      return self.train_or_val
+
    def store_matrix(matrix_name, matrix, step):
       self.writer.add_image(matrix_name, matrix, step)
 
    def close_writer():
       self.writer.close()
+      
