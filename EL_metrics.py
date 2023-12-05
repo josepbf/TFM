@@ -20,6 +20,9 @@ class Writer:
 
    def store_metric(metric_name, scalar, step):
       self.writer.add_scalar(metric_name, scalar, step)
+   
+   def store_matrix(matrix_name, matrix, step):
+      self.writer.add_image(matrix_name, matrix, step)
 
    def close_writer():
       self.writer.close()
