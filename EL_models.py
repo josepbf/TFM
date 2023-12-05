@@ -7,7 +7,7 @@ class Model:
     def __init__(self, 
                 model_name,
                 trainable_backbone_layers, 
-                num_classes = 5, 
+                num_classes = 4, 
                 pretrained = True, 
                 pretrained_backbone = True):
         self.model_name = model_name
