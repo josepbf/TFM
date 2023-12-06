@@ -21,12 +21,12 @@
 nvidia-smi
 #module load gcc
 #module load sqlite3
-#module load python3/3.6.2
-#module load cython/0.28.1-python-3.6.2
+#module load python3
+#module load cython
 #module load cuda
 
 source ../myVirtEnv/bin/activate
 
-/appl/python/3.6.2/bin/python3.6 EL_train.py 
+python3.6 EL_train.py 
 
 deactivate
