@@ -150,8 +150,8 @@ optimizer = optimizer_instance.get_optim()
 criterion = nn.CrossEntropyLoss() #TODO generalize
 
 # Metrics
-writer_training = Writer('',0)
-writer_validation = Writer('',1)
+writer_training = Writer('',0, config)
+writer_validation = Writer('',1, config)
 
 # Training
 epoch = 0
@@ -182,7 +182,7 @@ while epoch != num_epochs:
         evaluate_engine(net,validationloader,device, epoch, writer_validation, foldername_to_save_outputs)
 
         print("Computing confusion matrix training...")
-        #compute_confusion_matrix_training(epoch, writer, iou_threshold = 0.5, foldername_to_save_outputs)
+        #compute_confusion_matrix_training(epoch, writer, iou_threshold = 0.5, foldername_to_save_outputs, dataset_train_no_augmentation)
 
         print("Computing confusion matrix validation...")
         #compute_confusion_matrix_validation(epoch, iou_threshold = 0.5)
