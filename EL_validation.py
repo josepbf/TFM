@@ -68,7 +68,7 @@ def compute_confusion_matrix(epoch, writer, iou_threshold = 0.5, foldername_to_s
     
     #jsonPath = './FullTrainingDataset/Annotations'
 
-    masks_path = "/zhome/de/6/201864/Downloads/PVDefectsDS/MasksVersionH-CorrAugust2023'
+    masks_path = "/zhome/de/6/201864/Downloads/PVDefectsDS/MasksVersionH-CorrAugust2023"
 
     hash_table = dataset.get_hash_names()
 
