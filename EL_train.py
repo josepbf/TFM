@@ -170,7 +170,7 @@ while epoch != num_epochs:
 
     foldername_to_save_outputs = str("./runs/run_outputs_epoch_" + dt_string + "/epoch_" + str(epoch))
     
-    if epoch == 5 or epoch == 10:
+    if epoch == 1 or epoch == 5:
         print("Starting evaluation num. " + str(epoch))
         
         # evaluate on the train dataset

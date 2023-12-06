@@ -49,11 +49,11 @@ def loss_one_epoch_val(model, optimizer, data_loader, device, epoch, print_freq,
         loss_objectness = loss_dict_reduced['loss_objectness'].item()
         loss_rpn_box_reg = loss_dict_reduced['loss_rpn_box_reg'].item()
 
-        writer.store_metric(str('Loss_' + writer.get_folder_name() + '/loss'), loss, iteration)
-        writer.store_metric(str('Loss_' + writer.get_folder_name() + '/loss_classifier'), loss_classifier, iteration)
-        writer.store_metric(str('Loss_' + writer.get_folder_name() + '/loss_box_reg'), loss_box_reg, iteration)
-        writer.store_metric(str('Loss_' + writer.get_folder_name() + '/loss_objectness'), loss_objectness, iteration)
-        writer.store_metric(str('Loss_' + writer.get_folder_name() + '/loss_rpn_box_reg'), loss_rpn_box_reg, iteration)
+        writer.store_metric(str('Loss_' + writer.get_folder_name() + '/loss'), loss, str('iteration_' + writer.get_folder_name()), iteration)
+        writer.store_metric(str('Loss_' + writer.get_folder_name() + '/loss_classifier'), loss_classifier, str('iteration_' + writer.get_folder_name()), iteration)
+        writer.store_metric(str('Loss_' + writer.get_folder_name() + '/loss_box_reg'), loss_box_reg, str('iteration_' + writer.get_folder_name()), iteration)
+        writer.store_metric(str('Loss_' + writer.get_folder_name() + '/loss_objectness'), loss_objectness, str('iteration_' + writer.get_folder_name()), iteration)
+        writer.store_metric(str('Loss_' + writer.get_folder_name() + '/loss_rpn_box_reg'), loss_rpn_box_reg, str('iteration_' + writer.get_folder_name()), iteration)
 
         #metric_logger.update(loss=losses_reduced, **loss_dict_reduced)
         #metric_logger.update(lr=optimizer.param_groups[0]["lr"])
@@ -644,9 +644,9 @@ class CocoEvaluator(object):
       
             mAP_IoU_50_95, mAP_IoU_50, mAR_IoU_50_95 = coco_eval.summarize_mAP_mAR()
             
-            writer.store_metric('Accuracy/mAP_IoU_50_95', mAP_IoU_50_95,epoch)
-            writer.store_metric('Accuracy/mAP_IoU_50', mAP_IoU_50,epoch)
-            writer.store_metric('Accuracy/mAR_IoU_50_95', mAR_IoU_50_95,epoch)
+            writer.store_metric('Accuracy_' + writer.get_folder_name() + '/mAP_IoU_50_95', mAP_IoU_50_95, str('epoch_' + writer.get_folder_name()), epoch)
+            writer.store_metric('Accuracy_' + writer.get_folder_name() + '/mAP_IoU_50', mAP_IoU_50, str('epoch_' + writer.get_folder_name()), epoch)
+            writer.store_metric('Accuracy_' + writer.get_folder_name() + '/mAR_IoU_50_95', mAR_IoU_50_95, str('epoch_' + writer.get_folder_name()), epoch)
 
     def prepare(self, predictions, iou_type):
         if iou_type == "bbox":

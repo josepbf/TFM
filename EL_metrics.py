@@ -12,15 +12,15 @@ class Writer:
       self.folder_name = ''
 
       if self.train_or_val == 0:
-         self.folder_name = 'training'
+         self.folder_name = 'train'
       else:
-         self.folder_name = 'validation'
+         self.folder_name = 'val'
 
       wandb.init(project=name_experiment, config = config)
 
 
-   def store_metric(self, metric_name, scalar, step):
-      wandb.log({metric_name: scalar, 'step': step})
+   def store_metric(self, metric_name, scalar, step_name, step):
+      wandb.log({metric_name: scalar, step_name: step})
    
    def get_train_or_val(self):
       return self.train_or_val
@@ -28,8 +28,8 @@ class Writer:
    def get_folder_name(self):
       return self.folder_name
 
-   def store_matrix(self, matrix_name, matrix, step):
-      wandb.log({matrix_name: matrix.numpy()}, step=step)
+   def store_matrix(self, matrix_name, matrix, step_name, step):
+      wandb.log({matrix_name: matrix.numpy(), step_name: step})
 
    def close_writer(self):
       wandb.finish()
