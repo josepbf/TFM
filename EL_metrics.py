@@ -9,11 +9,12 @@ class Writer:
       self.train_or_val = train_or_val # 0 for train, 1 for val
       if len(self.name_experiment) == 0:
          self.name_experiment = 'finding_bugs'
+      self.folder_name = ''
 
       if self.train_or_val == 0:
-         folder_name = 'training'
+         self.folder_name = 'training'
       else:
-         folder_name = 'validation'
+         self.folder_name = 'validation'
 
       wandb.init(project=name_experiment, config = config)
 
@@ -23,6 +24,9 @@ class Writer:
    
    def get_train_or_val(self):
       return self.train_or_val
+
+   def get_folder_name(self):
+      return self.folder_name
 
    def store_matrix(self, matrix_name, matrix, step):
       wandb.log({matrix_name: matrix.numpy()}, step=step)
