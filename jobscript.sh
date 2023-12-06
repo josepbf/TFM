@@ -27,6 +27,6 @@ nvidia-smi
 
 source ../myVirtEnv/bin/activate
 
-python3.6 EL_train.py 
+python3 EL_train.py 
 
 deactivate
