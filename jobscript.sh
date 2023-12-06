@@ -19,14 +19,15 @@
 # -- end of LSF options --
 
 nvidia-smi
-#module load gcc
-#module load sqlite3
-#module load python3
-#module load cython
-#module load cuda
+#module load gcc/10.3.0-binutils-2.36.1
+#module load gcc/12.3.0-binutils-2.40
+#module load sqlite3/3.42.0
+#module load python3/3.11.4
+#module load cython/0.29.35-python-3.11.4
+#module load cuda/11.6
 
 source ../myVirtEnv/bin/activate
 
-python3 EL_train.py 
+/appl/python/3.11.4/bin/python3.11 EL_train.py 
 
 deactivate

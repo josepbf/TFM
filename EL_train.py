@@ -168,7 +168,7 @@ while epoch != num_epochs:
     train_one_epoch(net, optimizer, trainloader, device, epoch, print_freq=1, iteration=iteration, writer = writer_training)
     loss_one_epoch_val(net, optimizer, validation_data_loader, device, epoch, print_freq=1, iteration=iteration, writer = writer_validation)
 
-    foldername_to_save_outputs = str("./run_outputs_epoch_" + dt_string + "/epoch_" + str(epoch))
+    foldername_to_save_outputs = str("./runs/run_outputs_epoch_" + dt_string + "/epoch_" + str(epoch))
     
     if epoch == 5 or epoch == 10:
         print("Starting evaluation num. " + str(epoch))
@@ -182,10 +182,10 @@ while epoch != num_epochs:
         evaluate_engine(net,validationloader,device, epoch, writer_validation, foldername_to_save_outputs)
 
         print("Computing confusion matrix training...")
-        #compute_confusion_matrix(epoch, writer, foldername_to_save_outputs, dataset_train_no_augmentation, iou_threshold = 0.5)
+        #compute_confusion_matrix(epoch, writer_training, foldername_to_save_outputs, dataset_train_no_augmentation, iou_threshold = 0.5)
 
         print("Computing confusion matrix validation...")
-        #compute_confusion_matrix_validation(epoch, iou_threshold = 0.5)
+        #compute_confusion_matrix(epoch, writer_validation, foldername_to_save_outputs, dataset_train_no_augmentation, iou_threshold = 0.5)
 
         print("Saving the model...")
         #net_instance.save_model(net, epoch)
