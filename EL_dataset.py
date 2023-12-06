@@ -173,7 +173,6 @@ class PVDefectsDS(torch.utils.data.Dataset):
         split_train_val_test_csv = pandas.read_csv(self.dataset_path + 'split_train_val_test.csv')
 
         self.split_imgs_name = []
-        print(split_train_val_test_csv.columns)
         if train_val_test == 0:
           # Train
           for i in range(len(split_train_val_test_csv)):
