@@ -20,7 +20,7 @@ class Writer:
 
 
    def store_metric(self, metric_name, scalar, step):
-      wandb.log({metric_name: scalar}, step=step)
+      wandb.log({metric_name: scalar, 'step': step})
    
    def get_train_or_val(self):
       return self.train_or_val
