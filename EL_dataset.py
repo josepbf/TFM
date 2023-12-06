@@ -197,7 +197,7 @@ class PVDefectsDS(torch.utils.data.Dataset):
           hash_image_name = str(hash(self.split_imgs_name[i]))
           hash_image_name = hash_image_name[1:18]
           new_row = {'image_name': self.split_imgs_name[i], 'hash': hash_image_name}
-          self.hash_names_table = pandas.concat([self.hash_names_table, pd.DataFrame([new_row])], ignore_index=True)
+          self.hash_names_table = pandas.concat([self.hash_names_table, pandas.DataFrame([new_row])], ignore_index=True)
           
 
 
