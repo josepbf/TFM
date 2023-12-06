@@ -176,7 +176,6 @@ class PVDefectsDS(torch.utils.data.Dataset):
         print(split_train_val_test_csv.columns)
         if train_val_test == 0:
           # Train
-
           for i in range(len(split_train_val_test_csv)):
             if split_train_val_test_csv.at[i,'train_val_test_split'] == 0:
               self.split_imgs_name.append(split_train_val_test_csv.at[i,"name_image"])
@@ -190,6 +189,18 @@ class PVDefectsDS(torch.utils.data.Dataset):
           for i in range(len(split_train_val_test_csv)):
             if split_train_val_test_csv.at[i,'train_val_test_split'] == 2:
               self.split_imgs_name.append(split_train_val_test_csv.at[i,"name_image"])
+        
+        # Create hash name table
+        columns = ['image_name', 'hash']
+        self.hash_names_table = pandas.DataFrame(columns=columns)
+        for i in range(len(self.split_imgs_name)):
+          hash_image_name = str(hash(self.split_imgs_name[i]))
+          hash_image_name = hash_image_name[1:18]
+          new_row = {'image_name': self.split_imgs_name[i], 'hash': hash_image_name}
+          self.hash_names_table = self.hash_names_table.append(new_row, ignore_index=True)
+
+
+
 
     def __getitem__(self, idx):
         # define paths
@@ -295,3 +306,13 @@ class PVDefectsDS(torch.utils.data.Dataset):
 
     def __len__(self):
       return len(self.split_imgs_name)
+
+    def get_hash_names(self):
+      return self.hash_names_table
+    
+    def get_imgs_names(self):
+      return self.imgs_names
+
+    def get_labels(self):
+      return self.labels
+
