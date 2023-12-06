@@ -58,7 +58,7 @@ def loss_one_epoch_val(model, optimizer, data_loader, device, epoch, print_freq,
         #metric_logger.update(loss=losses_reduced, **loss_dict_reduced)
         #metric_logger.update(lr=optimizer.param_groups[0]["lr"])
 
-def compute_confusion_matrix(epoch, writer, iou_threshold = 0.5, foldername_to_save_outputs, dataset):
+def compute_confusion_matrix(epoch, writer, foldername_to_save_outputs, dataset, iou_threshold = 0.5):
   # Read all the names of outputs
 
     if writer.get_train_or_val() == 1:

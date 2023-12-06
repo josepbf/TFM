@@ -182,7 +182,7 @@ while epoch != num_epochs:
         evaluate_engine(net,validationloader,device, epoch, writer_validation, foldername_to_save_outputs)
 
         print("Computing confusion matrix training...")
-        #compute_confusion_matrix(epoch, writer, iou_threshold = 0.5, foldername_to_save_outputs, dataset_train_no_augmentation)
+        #compute_confusion_matrix(epoch, writer, foldername_to_save_outputs, dataset_train_no_augmentation, iou_threshold = 0.5)
 
         print("Computing confusion matrix validation...")
         #compute_confusion_matrix_validation(epoch, iou_threshold = 0.5)
