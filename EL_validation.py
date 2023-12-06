@@ -97,7 +97,6 @@ def compute_confusion_matrix(epoch, writer, foldername_to_save_outputs, dataset,
             result_df = hash_table.loc[hash_table['hash'] == targetHash]
             targetName = result_df.at[result_df.index[0], 'image_name']            
 
-            # TODO: Això s'ha de canviar
             mask_data = scipy.io.loadmat(masks_path + "/GT_" + str(targetName) + ".mat")
         
             imgs_names_dataset = dataset.get_imgs_names()
