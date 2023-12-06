@@ -49,11 +49,11 @@ def loss_one_epoch_val(model, optimizer, data_loader, device, epoch, print_freq,
         loss_objectness = loss_dict_reduced['loss_objectness'].item()
         loss_rpn_box_reg = loss_dict_reduced['loss_rpn_box_reg'].item()
 
-        writer.store_metric(str('Loss_' + writer.get_folder_name() '/loss'), loss, iteration)
-        writer.store_metric(str('Loss_' + writer.get_folder_name() '/loss_classifier'), loss_classifier, iteration)
-        writer.store_metric(str('Loss_' + writer.get_folder_name() '/loss_box_reg'), loss_box_reg, iteration)
-        writer.store_metric(str('Loss_' + writer.get_folder_name() '/loss_objectness'), loss_objectness, iteration)
-        writer.store_metric(str('Loss_' + writer.get_folder_name() '/loss_rpn_box_reg'), loss_rpn_box_reg, iteration)
+        writer.store_metric(str('Loss_' + writer.get_folder_name() + '/loss'), loss, iteration)
+        writer.store_metric(str('Loss_' + writer.get_folder_name() + '/loss_classifier'), loss_classifier, iteration)
+        writer.store_metric(str('Loss_' + writer.get_folder_name() + '/loss_box_reg'), loss_box_reg, iteration)
+        writer.store_metric(str('Loss_' + writer.get_folder_name() + '/loss_objectness'), loss_objectness, iteration)
+        writer.store_metric(str('Loss_' + writer.get_folder_name() + '/loss_rpn_box_reg'), loss_rpn_box_reg, iteration)
 
         #metric_logger.update(loss=losses_reduced, **loss_dict_reduced)
         #metric_logger.update(lr=optimizer.param_groups[0]["lr"])
