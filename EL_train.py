@@ -14,7 +14,7 @@ from EL_dataset import PVDefectsDS, get_transform, collate_fn
 from EL_train_utils import train_one_epoch
 from EL_utils import int_to_boolean
 from EL_optim import Optimizer
-from EL_validation import evaluate_engine, loss_one_epoch_val, compute_confusion_matrix_training 
+from EL_validation import evaluate_engine, loss_one_epoch_val, compute_confusion_matrix 
 from EL_metrics import Writer
 
 import argparse
@@ -182,7 +182,7 @@ while epoch != num_epochs:
         evaluate_engine(net,validationloader,device, epoch, writer_validation, foldername_to_save_outputs)
 
         print("Computing confusion matrix training...")
-        #compute_confusion_matrix_training(epoch, writer, iou_threshold = 0.5, foldername_to_save_outputs, dataset_train_no_augmentation)
+        #compute_confusion_matrix(epoch, writer, iou_threshold = 0.5, foldername_to_save_outputs, dataset_train_no_augmentation)
 
         print("Computing confusion matrix validation...")
         #compute_confusion_matrix_validation(epoch, iou_threshold = 0.5)
