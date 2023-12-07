@@ -315,7 +315,7 @@ def evaluate_engine(model, data_loader, device, epoch, writer, foldername_to_sav
     coco = get_coco_api_from_dataset(data_loader.dataset)
     iou_types = _get_iou_types(model)
     coco_evaluator = CocoEvaluator(coco, iou_types, epoch)
-    """
+
     # directory save
     if writer.get_train_or_val() == 1:
         path = str(foldername_to_save_outputs + '_val')
@@ -325,7 +325,7 @@ def evaluate_engine(model, data_loader, device, epoch, writer, foldername_to_sav
         path = str(foldername_to_save_outputs + '_train')
         os.makedirs(path, exist_ok=True)
         output_directory_name = str(path + '/')
-    """
+
     for image, targets in metric_logger.log_every(data_loader, 100, epoch, header):
         image = list(img.to(device) for img in image)
         targets = [{k: v.to(device) for k, v in t.items()} for t in targets]
@@ -334,14 +334,14 @@ def evaluate_engine(model, data_loader, device, epoch, writer, foldername_to_sav
         model_time = time.time()
         outputs = model(image)
 
-        """
+
         outputs_to_save = outputs
         targets_copy = targets
         for i in range(len(outputs_to_save)):
           outputs_to_save[i]['image_id'] = targets_copy[i]['image_id']
           output_name = str(output_directory_name + str(targets_copy[i]['image_id'].item()) + '.pt')
           torch.save(outputs_to_save[i], output_name)
-        """
+
         outputs = [{k: v.to(cpu_device) for k, v in t.items()} for t in outputs]
         model_time = time.time() - model_time
 
