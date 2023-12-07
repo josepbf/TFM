@@ -263,9 +263,9 @@ def compute_confusion_matrix(epoch, writer, foldername_to_save_outputs, dataset,
                         print("Precision (score = 50): " + str(precision_50))
                         print("Recall (score = 50): " + str(recall_50))
                         print("Fmeasure (score = 50): " + str(fmeasure_50))
-                        writer.store_metric('ConfusionMatrix/precision_0.5_score', precision_50, epoch)
-                        writer.store_metric('ConfusionMatrix/recall_0.5_score', recall_50, epoch)
-                        writer.store_metric('ConfusionMatrix/fmeasure_0.5_score', fmeasure_50, epoch)
+                        writer.store_metric('ConfusionMatrix' + writer.get_folder_name() + '/precision_0.5_score', precision_50, str('epoch_' + writer.get_folder_name()), epoch)
+                        writer.store_metric('ConfusionMatrix' + writer.get_folder_name() + '/recall_0.5_score', recall_50, str('epoch_' + writer.get_folder_name()), epoch)
+                        writer.store_metric('ConfusionMatrix' + writer.get_folder_name() + '/fmeasure_0.5_score', fmeasure_50, str('epoch_' + writer.get_folder_name()), epoch)
                     if score_threshold == 0.7:
                         score_name = '70'
                         precision_70 = true_positive / positive
@@ -274,9 +274,9 @@ def compute_confusion_matrix(epoch, writer, foldername_to_save_outputs, dataset,
                         print("Precision (score = 70): " + str(precision_70))
                         print("Recall (score = 70): " + str(recall_70))
                         print("Fmeasure (score = 70): " + str(fmeasure_70))
-                        writer.store_metric('ConfusionMatrix/precision_0.7_score', precision_70, epoch)
-                        writer.store_metric('ConfusionMatrix/recall_0.7_score', recall_70, epoch)
-                        writer.store_metric('ConfusionMatrix/fmeasure_0.7_score', fmeasure_70, epoch)
+                        writer.store_metric('ConfusionMatrix' + writer.get_folder_name() + '/precision_0.7_score', precision_70, str('epoch_' + writer.get_folder_name()), epoch)
+                        writer.store_metric('ConfusionMatrix' + writer.get_folder_name() + '/recall_0.7_score', recall_70, str('epoch_' + writer.get_folder_name()), epoch)
+                        writer.store_metric('ConfusionMatrix' + writer.get_folder_name() + '/fmeasure_0.7_score', fmeasure_70, str('epoch_' + writer.get_folder_name()), epoch)
                     if score_threshold == 0.9:
                         score_name = '90'        
                         precision_90 = true_positive / positive
@@ -285,11 +285,11 @@ def compute_confusion_matrix(epoch, writer, foldername_to_save_outputs, dataset,
                         print("Precision (score = 90): " + str(precision_90))
                         print("Recall (score = 90): " + str(recall_90))
                         print("Fmeasure (score = 90): " + str(fmeasure_90))
-                        writer.store_metric('ConfusionMatrix/precision_0.9_score', precision_90, epoch)
-                        writer.store_metric('ConfusionMatrix/recall_0.9_score', recall_90, epoch)
-                        writer.store_metric('ConfusionMatrix/fmeasure_0.9_score', fmeasure_90, epoch)
+                        writer.store_metric('ConfusionMatrix' + writer.get_folder_name() + '/precision_0.9_score', precision_90, str('epoch_' + writer.get_folder_name()), epoch)
+                        writer.store_metric('ConfusionMatrix' + writer.get_folder_name() + '/recall_0.9_score', recall_90, str('epoch_' + writer.get_folder_name()), epoch)
+                        writer.store_metric('ConfusionMatrix' + writer.get_folder_name() + '/fmeasure_0.9_score', fmeasure_90, str('epoch_' + writer.get_folder_name()), epoch)
                 # Store confusion matrix image
-                writer.store_matrix('ConfusionMatrix/matrix', confusion_matrix, epoch)     
+                writer.store_matrix('ConfusionMatrix' + writer.get_folder_name() + '/matrix', confusion_matrix, str('epoch_' + writer.get_folder_name()), epoch)
 
 def _get_iou_types(model):
     model_without_ddp = model
