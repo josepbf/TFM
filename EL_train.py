@@ -39,7 +39,7 @@ parser.add_argument("-O", "--save_optim", action='store_true', help="save the op
 
 # Training param
 parser.add_argument("-e", "--num_epochs", type=int, default=11, help="number of epochs")
-parser.add_argument("-b", "--batch_size", type=int, default=16, help="batch size")
+parser.add_argument("-b", "--batch_size", type=int, default=8, help="batch size")
 
 # Optimizer hyper-param
 parser.add_argument("--optim_name", type=str, default='Adam')
