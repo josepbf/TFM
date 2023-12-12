@@ -92,14 +92,13 @@ def compute_confusion_matrix(epoch, writer, foldername_to_save_outputs, dataset,
             targetHash = targetHash.replace(".pt","")
             result_df = hash_table.loc[hash_table['hash'] == targetHash]
             targetName = result_df.at[result_df.index[0], 'image_name']            
-
-            mask_data = scipy.io.loadmat(masks_path + "/GT_" + str(targetName) + ".mat")
         
 
             imgs_names_dataset = dataset.get_imgs_names()
             row_index = imgs_names_dataset[imgs_names_dataset["namesAllCells"] == targetName].index[0]
             number_of_labels = int(imgs_names_dataset["nbDefAllCellsVH"].values[row_index])
             if number_of_labels != 0:
+                mask_data = scipy.io.loadmat(masks_path + "/GT_" + str(targetName) + ".mat")
                 row = dataset.get_labels.loc[dataset.get_labels["namesCellsWF"] == targetName]
                 if row['nbCAVH'].values[0] > 0:
                     img_class = torch.tensor(1, dtype=torch.uint8)
