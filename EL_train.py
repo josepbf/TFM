@@ -38,7 +38,7 @@ parser.add_argument("-O", "--save_optim", action='store_true', help="save the op
 #parser.add_argument("name", help="Name to be saved")
 
 # Training param
-parser.add_argument("-e", "--num_epochs", type=int, default=11, help="number of epochs")
+parser.add_argument("-e", "--num_epochs", type=int, default=3, help="number of epochs")
 parser.add_argument("-b", "--batch_size", type=int, default=8, help="batch size")
 
 # Optimizer hyper-param
@@ -170,7 +170,7 @@ while epoch != num_epochs:
 
     foldername_to_save_outputs = str("./runs/run_outputs_" + dt_string + "/epoch_" + str(epoch))
     
-    if epoch == 1 or epoch == 5:
+    if epoch == 0 or epoch == 1:
         print("Starting evaluation num. " + str(epoch))
         
         # evaluate on the train dataset
