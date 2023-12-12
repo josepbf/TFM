@@ -95,6 +95,7 @@ def compute_confusion_matrix(epoch, writer, foldername_to_save_outputs, dataset,
 
             mask_data = scipy.io.loadmat(masks_path + "/GT_" + str(targetName) + ".mat")
         
+
             imgs_names_dataset = dataset.get_imgs_names()
             row_index = imgs_names_dataset[imgs_names_dataset["namesAllCells"] == targetName].index[0]
             number_of_labels = int(imgs_names_dataset["nbDefAllCellsVH"].values[row_index])
@@ -113,16 +114,25 @@ def compute_confusion_matrix(epoch, writer, foldername_to_save_outputs, dataset,
             else:
                 img_class = torch.tensor(0, dtype=torch.uint8)
 
-            number_of_boxes = len(mask_data['GTLabelVH'])
-            masks = mask_data['GTMaskVH']
-            bbox = []
-            labels = []
+            if img_class != 0:
+                number_of_boxes = len(mask_data['GTLabelVH'])
+                masks = mask_data['GTMaskVH']
+                bbox = []
+                labels = []
 
-            mask = masks
-            if number_of_boxes > 1:
-                for i in range(number_of_boxes):
-                    mask = masks[:,:,i]
-                    xmin = math.trunc(min(np.where(mask != 0)[1]) * (300 / original_size[0])) 
+                mask = masks
+                if number_of_boxes > 1:
+                    for i in range(number_of_boxes):
+                        mask = masks[:,:,i]
+                        xmin = math.trunc(min(np.where(mask != 0)[1]) * (300 / original_size[0])) 
+                        xmax = math.trunc(max(np.where(mask != 0)[1]) * (300 / original_size[0]))
+                        ymin = math.trunc(min(np.where(mask != 0)[0]) * (300 / original_size[1]))
+                        ymax = math.trunc(max(np.where(mask != 0)[0]) * (300 / original_size[1]))
+
+                        bbox.append((xmin, ymin, xmax, ymax))
+                        labels.append(img_class)
+                else:
+                    xmin = math.trunc(min(np.where(mask != 0)[1]) * (300 / original_size[0]))
                     xmax = math.trunc(max(np.where(mask != 0)[1]) * (300 / original_size[0]))
                     ymin = math.trunc(min(np.where(mask != 0)[0]) * (300 / original_size[1]))
                     ymax = math.trunc(max(np.where(mask != 0)[0]) * (300 / original_size[1]))
@@ -130,13 +140,8 @@ def compute_confusion_matrix(epoch, writer, foldername_to_save_outputs, dataset,
                     bbox.append((xmin, ymin, xmax, ymax))
                     labels.append(img_class)
             else:
-                xmin = math.trunc(min(np.where(mask != 0)[1]) * (300 / original_size[0]))
-                xmax = math.trunc(max(np.where(mask != 0)[1]) * (300 / original_size[0]))
-                ymin = math.trunc(min(np.where(mask != 0)[0]) * (300 / original_size[1]))
-                ymax = math.trunc(max(np.where(mask != 0)[0]) * (300 / original_size[1]))
-
-                bbox.append((xmin, ymin, xmax, ymax))
-                labels.append(img_class)
+                bbox = []
+                labels = []
 
             ground_truth_boxes = torch.tensor(bbox, dtype=torch.float)
             ground_truth_labels = torch.tensor(labels, dtype=torch.int64)
