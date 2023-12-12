@@ -72,11 +72,6 @@ def compute_confusion_matrix(epoch, writer, foldername_to_save_outputs, dataset,
 
     hash_table = dataset.get_hash_names()
 
-    image_name = self.split_imgs_name[idx]
-    image_id = str(hash(image_name))
-    image_id = image_id[1:18]
-    image_id = int(image_id)
-
     outputNames = [f for f in listdir(outputsPath) if isfile(join(outputsPath, f))]
     outputNames.sort()
 
