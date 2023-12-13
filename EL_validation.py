@@ -114,7 +114,7 @@ def compute_confusion_matrix(epoch, writer, foldername_to_save_outputs, dataset,
             number_of_labels = int(imgs_names_dataset["nbDefAllCellsVH"].values[row_index])
             if number_of_labels != 0:
                 mask_data = scipy.io.loadmat(masks_path + "/GT_" + str(targetName) + ".mat")
-                labels_dataset = dataset.get_labels
+                labels_dataset = dataset.get_labels()
                 row = labels_dataset.loc[labels_dataset["namesCellsWF"] == targetName]
                 if row['nbCAVH'].values[0] > 0:
                     img_class = torch.tensor(1, dtype=torch.uint8)
