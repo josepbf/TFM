@@ -72,7 +72,7 @@ def compute_confusion_matrix(epoch, writer, foldername_to_save_outputs, dataset,
     masks_path = "/zhome/de/6/201864/Downloads/PVDefectsDS/MasksVersionH-CorrAugust2023"
 
     hash_table = dataset.get_hash_names()
-
+    print(hash_table)
     outputNames = [f for f in listdir(outputsPath) if isfile(join(outputsPath, f))]
     outputNames.sort()
 
@@ -91,7 +91,7 @@ def compute_confusion_matrix(epoch, writer, foldername_to_save_outputs, dataset,
             targetHash = outputNames[out_ind]
             targetHash = targetHash.replace(".pt","").strip()
             print(targetHash)
-            result_df = hash_table.loc[hash_table['hash'] == targetHash]
+            result_df = hash_table.loc[hash_table['hash'].str.strip() == targetHash]
             print(result_df)
             targetName = result_df.iloc[0]['image_name']
         
