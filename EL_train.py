@@ -117,6 +117,8 @@ model_name = config['model_name']
 trainable_backbone_layers = config['trainable_backbone_layers']
 net_instance = Model(model_name=model_name, trainable_backbone_layers=trainable_backbone_layers)
 net = net_instance.get_model()
+print("Model layers:")
+print(net)
 
 net = net.to(device)
 if seed != 0:
