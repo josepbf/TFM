@@ -93,7 +93,7 @@ def compute_confusion_matrix(epoch, writer, foldername_to_save_outputs, dataset,
             print(targetHash)
             result_df = hash_table.loc[hash_table['hash'] == targetHash]
             print(result_df)
-            targetName = result_df.at[result_df.index[0], 'image_name']            
+            targetName = result_df.iloc[0]['image_name']
         
 
             imgs_names_dataset = dataset.get_imgs_names()
