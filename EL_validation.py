@@ -90,7 +90,9 @@ def compute_confusion_matrix(epoch, writer, foldername_to_save_outputs, dataset,
 
             targetHash = outputNames[out_ind]
             targetHash = targetHash.replace(".pt","")
+            print(targetHash)
             result_df = hash_table.loc[hash_table['hash'] == targetHash]
+            print(result_df)
             targetName = result_df.at[result_df.index[0], 'image_name']            
         
 
