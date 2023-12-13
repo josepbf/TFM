@@ -89,7 +89,7 @@ def compute_confusion_matrix(epoch, writer, foldername_to_save_outputs, dataset,
             out = torch.load(str(outputsPath + '/' + outputNames[out_ind]))
 
             targetHash = outputNames[out_ind]
-            targetHash = targetHash.replace(".pt","")
+            targetHash = targetHash.replace(".pt","").strip()
             print(targetHash)
             result_df = hash_table.loc[hash_table['hash'] == targetHash]
             print(result_df)
