@@ -185,7 +185,7 @@ while epoch != num_epochs:
         compute_confusion_matrix(epoch, writer_training, foldername_to_save_outputs, dataset_train_no_augmentation, iou_threshold = 0.5)
 
         print("Computing confusion matrix validation...")
-        compute_confusion_matrix(epoch, writer_validation, foldername_to_save_outputs, dataset_train_no_augmentation, iou_threshold = 0.5)
+        compute_confusion_matrix(epoch, writer_validation, foldername_to_save_outputs, dataset_validation, iou_threshold = 0.5)
 
         print("Saving the model...")
         #net_instance.save_model(net, epoch)
