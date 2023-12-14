@@ -14,6 +14,9 @@ import math
 from os import listdir
 from os.path import isfile, join
 
+import PIL
+from PIL import Image
+
 import collections
 from collections import defaultdict, deque
 
