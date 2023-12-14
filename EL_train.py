@@ -38,7 +38,7 @@ parser.add_argument("-O", "--save_optim", action='store_true', help="save the op
 #parser.add_argument("name", help="Name to be saved")
 
 # Training param
-parser.add_argument("-e", "--num_epochs", type=int, default=3, help="number of epochs")
+parser.add_argument("-e", "--num_epochs", type=int, default=7, help="number of epochs")
 parser.add_argument("-b", "--batch_size", type=int, default=8, help="batch size")
 
 # Optimizer hyper-param
@@ -167,24 +167,24 @@ while epoch != num_epochs:
     print("Starting training num." + str(epoch))
     # train for one epoch, printing every 10 iterations
     iteration = len(trainloader)*epoch
-    #train_one_epoch(net, optimizer, trainloader, device, epoch, print_freq=1, iteration=iteration, writer = writer_training)
-    #loss_one_epoch_val(net, optimizer, validationloader, device, epoch, print_freq=1, iteration=iteration, writer = writer_validation)
+    train_one_epoch(net, optimizer, trainloader, device, epoch, print_freq=1, iteration=iteration, writer = writer_training)
+    loss_one_epoch_val(net, optimizer, validationloader, device, epoch, print_freq=1, iteration=iteration, writer = writer_validation)
 
     foldername_to_save_outputs = str("./runs/run_outputs_" + dt_string + "/epoch_" + str(epoch))
     
-    if epoch == 0 or epoch == 1:
+    if epoch == 3 or epoch == 6:
         print("Starting evaluation num. " + str(epoch))
         
         # evaluate on the train dataset
         print("Starting train data evaluation...")
-        #evaluate_engine(net,trainloader_no_augmentation,device, epoch, writer_training, foldername_to_save_outputs)
+        evaluate_engine(net,trainloader_no_augmentation,device, epoch, writer_training, foldername_to_save_outputs)
         
         # evaluate on the validation dataset
         print("Starting validation data evaluation...")
         evaluate_engine(net,validationloader,device, epoch, writer_validation, foldername_to_save_outputs)
 
         print("Computing confusion matrix training...")
-        #compute_confusion_matrix(epoch, writer_training, foldername_to_save_outputs, dataset_train_no_augmentation, iou_threshold = 0.5)
+        compute_confusion_matrix(epoch, writer_training, foldername_to_save_outputs, dataset_train_no_augmentation, iou_threshold = 0.5)
 
         print("Computing confusion matrix validation...")
         compute_confusion_matrix(epoch, writer_validation, foldername_to_save_outputs, dataset_validation, iou_threshold = 0.5)
