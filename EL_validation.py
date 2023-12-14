@@ -75,7 +75,6 @@ def compute_confusion_matrix(epoch, writer, foldername_to_save_outputs, dataset,
     masks_path = "/zhome/de/6/201864/Downloads/PVDefectsDS/MasksVersionH-CorrAugust2023"
 
     hash_table = dataset.get_hash_names()
-    print(hash_table)
     # Remove leading zeros from the 'hash' column in the DataFrame
     hash_table['hash'] = hash_table['hash'].str.lstrip("0")
     hash_table['hash'] = hash_table['hash'].astype(str)
@@ -96,9 +95,7 @@ def compute_confusion_matrix(epoch, writer, foldername_to_save_outputs, dataset,
 
             targetHash = outputNames[out_ind]
             targetHash = targetHash.replace(".pt","")
-            print(targetHash)
             result_df = hash_table.loc[hash_table['hash'] == targetHash]
-            print(result_df)
             targetName = result_df.iloc[0]['image_name']
 
 
@@ -268,7 +265,7 @@ def compute_confusion_matrix(epoch, writer, foldername_to_save_outputs, dataset,
                 true_positive = confusion_matrix[1,1] + confusion_matrix[2,2] + confusion_matrix[3,3]
                 positive = true_positive + confusion_matrix[1,2] +confusion_matrix[1,3] + confusion_matrix[2,1] + confusion_matrix[2,3] +confusion_matrix[3,1] + confusion_matrix[3,2] +confusion_matrix[0,1]+confusion_matrix[0,2]+confusion_matrix[0,3]
                 true = true_positive + confusion_matrix[1,2] +confusion_matrix[1,3] + confusion_matrix[2,1] + confusion_matrix[2,3] +confusion_matrix[3,1] + confusion_matrix[3,2] + confusion_matrix[1,0]+confusion_matrix[2,0]+confusion_matrix[3,0]
-
+            
                 if positive>0 and true>0:
                     if score_threshold == 0.5:
                         score_name = '50'
