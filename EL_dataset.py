@@ -314,7 +314,7 @@ class PVDefectsDS(torch.utils.data.Dataset):
 
 class Sampler:
   def __init__(self, dataset):
-    self.dataset
+    self.dataset = dataset
 
   def get_WeightedRandomSampler(self):
     # Initialize an empty list to store class labels
