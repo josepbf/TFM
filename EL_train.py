@@ -131,7 +131,7 @@ dataset_validation = PVDefectsDS(get_transform(train=False), train_val_test = 1)
 dataset_test = PVDefectsDS(get_transform(train=False), train_val_test = 2)
 
 # Handling data imbalance
-sampler_instance = Sampler(dataset_train)
+sampler_instance = Sampler(dataset = dataset_train)
 sampler = sampler_instance.get_WeightedRandomSampler()
 
 # Loading dataset
