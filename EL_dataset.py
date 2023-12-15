@@ -197,9 +197,6 @@ class PVDefectsDS(torch.utils.data.Dataset):
           hash_image_name = hash_image_name[1:18]
           new_row = {'image_name': self.split_imgs_name[i], 'hash': hash_image_name}
           self.hash_names_table = pandas.concat([self.hash_names_table, pandas.DataFrame([new_row])], ignore_index=True)
-          
-
-
 
     def __getitem__(self, idx):
         # define paths
@@ -317,3 +314,34 @@ class PVDefectsDS(torch.utils.data.Dataset):
     def get_labels(self):
       return self.labels
 
+class Sampler:
+  def __init__(self, dataset):
+    self.dataset
+
+  def get_WeightedRandomSampler(self):
+    # Initialize an empty list to store class labels
+    all_labels = []
+
+    # Iterate through the dataset to collect all labels
+    for idx in range(len(self.dataset)):
+      _, target = self.dataset[idx]
+      label = target['labels'][0].item()  # Extract the label from target
+      all_labels.append(label)
+
+    # Convert the list to a PyTorch tensor
+    all_labels_tensor = torch.tensor(all_labels)
+
+    # Calculate class counts
+    class_counts = torch.bincount(all_labels_tensor)
+
+    # Initialize an empty list to store weights for each sample
+    weights_per_sample = []
+    for idx in range(len(self.dataset)):
+      _, target = self.dataset[idx]
+      label = target['labels'][0].item()  # Extract the label from target
+      class_weight = 1.0 / class_counts[label].float()  # Inverse class frequency
+      weights_per_sample.append(class_weight)
+
+    # Create the sampler 
+    # Samples elements from [0,..,len(weights)-1] with given probabilities (weights). 
+    return torch.utils.data.WeightedRandomSampler(weight=weights_per_sample, num_samples=len(self.dataset), replacement=True)

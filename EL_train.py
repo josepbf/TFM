@@ -10,7 +10,7 @@ import time
 from datetime import datetime
 
 from EL_models import Model
-from EL_dataset import PVDefectsDS, get_transform, collate_fn
+from EL_dataset import PVDefectsDS, get_transform, collate_fn, Sampler
 from EL_train_utils import train_one_epoch
 from EL_utils import int_to_boolean
 from EL_optim import Optimizer
@@ -130,10 +130,18 @@ dataset_train_no_augmentation = PVDefectsDS(get_transform(train=False), train_va
 dataset_validation = PVDefectsDS(get_transform(train=False), train_val_test = 1)
 dataset_test = PVDefectsDS(get_transform(train=False), train_val_test = 2)
 
-trainloader = DataLoader(dataset_train, batch_size=batch_size, num_workers=num_workers, shuffle=True, collate_fn = collate_fn)
+# Handling data imbalance
+sampler_instance = Sampler(dataset_train)
+sampler = sampler_instance.get_WeightedRandomSampler()
+
+# Loading dataset
+trainloader = DataLoader(dataset_train, sampler = sampler, batch_size=batch_size, num_workers=num_workers, shuffle=False, collate_fn = collate_fn)
 trainloader_no_augmentation = DataLoader(dataset_train_no_augmentation, batch_size=batch_size, num_workers=num_workers, shuffle=False, collate_fn = collate_fn)
 validationloader = DataLoader(dataset_validation, batch_size=batch_size, num_workers=num_workers, shuffle=False, collate_fn = collate_fn)
 testloader = DataLoader(dataset_test, batch_size=batch_size, num_workers=num_workers, shuffle=False, collate_fn = collate_fn)
+
+# TODO: Visualise the distribution of our DataLoader batches
+# Source: https://towardsdatascience.com/demystifying-pytorchs-weightedrandomsampler-by-example-a68aceccb452
 
 # Loss function 
 net_params = [p for p in net.parameters() if p.requires_grad]
