@@ -304,8 +304,6 @@ class PVDefectsDS(torch.utils.data.Dataset):
       return len(self.split_imgs_name)
 
     def get_hash_names(self):
-      file_path = 'hash_names.csv'
-      self.hash_names_table.to_csv(file_path, index=False)
       return self.hash_names_table
     
     def get_imgs_names(self):
