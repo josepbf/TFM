@@ -342,4 +342,4 @@ class Sampler:
 
     # Create the sampler 
     # Samples elements from [0,..,len(weights)-1] with given probabilities (weights). 
-    return torch.utils.data.WeightedRandomSampler(weight=weights_per_sample, num_samples=len(self.dataset), replacement=True)
+    return torch.utils.data.WeightedRandomSampler(weights=weights_per_sample, num_samples=len(self.dataset), replacement=True)
