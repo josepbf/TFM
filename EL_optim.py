@@ -25,49 +25,49 @@ class Optimizer:
         self.scheduler_gamma = scheduler_gamma
 
         # Adadelta
-        if optim_name == 'Adadelta':
+        if self.optim_name == 'Adadelta':
             if optim_default:
                 self.optim = torch.optim.Adadelta(params = self.net_param, lr=1.0, rho=0.9, weight_decay=0)
             else:
                 self.optim = torch.optim.Adadelta(params = self.net_param, lr=self.lr, rho=self.rho, weight_decay=self.weight_decay)
 
         # Adagrad
-        if optim_name == 'Adagrad':
+        if self.optim_name == 'Adagrad':
             if optim_default:
                 self.optim = torch.optim.Adagrad(params = self.net_param, lr=0.01, weight_decay=0)
             else:
                 self.optim = torch.optim.Adagrad(params = self.net_param, lr=self.lr, weight_decay=self.weight_decay)
 
         # Adam
-        elif optim_name == 'Adam':
+        elif self.optim_name == 'Adam':
             if optim_default:
                 self.optim = torch.optim.Adam(params = self.net_param, lr=0.001, weight_decay=0, amsgrad=False)
             else:
                 self.optim = torch.optim.Adam(params = self.net_param, lr=self.lr, weight_decay=self.weight_decay, amsgrad=False)
 
         # Adam (AMSGrad variant)
-        elif optim_name == 'Adam_AMSGrad':
+        elif self.optim_name == 'Adam_AMSGrad':
             if optim_default:
                 self.optim = torch.optim.Adam(params = self.net_param, lr=0.001, weight_decay=0, amsgrad=True)
             else:
                 self.optim = torch.optim.Adam(params = self.net_param, lr=self.lr, weight_decay=self.weight_decay, amsgrad=True)
 
         # Adamax
-        elif optim_name == 'Adamax':
+        elif self.optim_name == 'Adamax':
             if optim_default:
                 self.optim = torch.optim.Adamax(params = self.net_param, lr=0.002, weight_decay=0)
             else:
                 self.optim = torch.optim.Adamax(params = self.net_param, lr=self.lr, weight_decay=self.weight_decay)
 
         # RMSprop
-        elif optim_name == 'Adamax':
+        elif self.optim_name == 'Adamax':
             if optim_default:
                 self.optim = torch.optim.RMSprop(params = self.net_param, lr=0.01, weight_decay=0, momentum=0)
             else:
                 optim = torch.optim.RMSprop(params = self.net_param, lr=self.lr, weight_decay=self.weight_decay, momentum=self.momentum)
 
         # SGD
-        elif optim_name == 'SGD':
+        elif self.optim_name == 'SGD':
             if optim_default:
                 print("NO DEFAULT!")
             else:
@@ -79,8 +79,17 @@ class Optimizer:
             
     def get_lr_scheduler(self):
         return self.lr_scheduler
-        
+
     def get_optim(self):
         return self.optim
+
+    def load_optim(self, name):
+        self.optim = self.optim.load_state_dict("./optim_saved/" + str(name) + ".pt", strict=False)
+
+    def save_optim(self, optim, epoch):
+        now = datetime.now()
+        dt_string = now.strftime("%d_%m_%Y_%H_%M_%S")
+        name_to_save = str("./" + self.optim_name + "_epoch_" + str(epoch) + dt_string + ".pt")
+        torch.save(self.optim.state_dict(), name_to_save)
 
     

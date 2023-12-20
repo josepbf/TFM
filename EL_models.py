@@ -77,6 +77,9 @@ class Model:
     def get_model(self):
         return self.model
 
+    def load_model(self, name):
+        self.model = torch.load("./models_saved/" + str(name) + ".pth")
+
     def save_model(self, net, epoch):
         now = datetime.now()
         dt_string = now.strftime("%d_%m_%Y_%H_%M_%S")
