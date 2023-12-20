@@ -50,6 +50,7 @@ parser.add_argument("-w", "--weight_decay", type=float, default=0, help="weight 
 parser.add_argument("-m ", "--momentum", type=float, default=0.9, help="momentum of the learning")
 parser.add_argument("--dampening", type=float, default=0)
 parser.add_argument("--nesterov", type=int, default=0, help="0 is off, 1 is on")
+parser.add_argument("-g", "--scheduler_gamma", type=float, default=0.99, help="gamma value for exp decay learning rate scheduler")
 
 # Data augmentation
 parser.add_argument("--gaussian_blur", type=int, default=0, help="gaussian_blur")
@@ -96,6 +97,7 @@ weight_decay = config['weight_decay']
 momentum = config['momentum']
 dampening = config['dampening']
 nesterov = int_to_boolean(config['nesterov'])
+scheduler_gamma = config['scheduler_gamma']
 
 # Hyper-parameters 
 num_epochs = config['num_epochs']
@@ -153,11 +155,10 @@ optimizer_instance = Optimizer(net_params,
                 weight_decay, # L2 penalty
                 momentum,
                 dampening,
-                nesterov)   
+                nesterov,
+                scheduler_gamma)   
 optimizer = optimizer_instance.get_optim()
-
-# Loss function
-criterion = nn.CrossEntropyLoss() #TODO generalize
+lr_scheduler = optimizer_instance.get_lr_scheduler()
 
 # Metrics
 writer_training = Writer('',0, config)
@@ -175,7 +176,7 @@ while epoch != num_epochs:
     print("Starting training num." + str(epoch))
     # train for one epoch, printing every 10 iterations
     iteration = len(trainloader)*epoch
-    train_one_epoch(net, optimizer, trainloader, device, epoch, print_freq=1, iteration=iteration, writer = writer_training)
+    train_one_epoch(net, optimizer, lr_scheduler, trainloader, device, epoch, print_freq=1, iteration=iteration, writer = writer_training)
     loss_one_epoch_val(net, optimizer, validationloader, device, epoch, print_freq=1, iteration=iteration, writer = writer_validation)
 
     foldername_to_save_outputs = str("./runs/run_outputs_" + dt_string + "/epoch_" + str(epoch))
@@ -198,7 +199,7 @@ while epoch != num_epochs:
         compute_confusion_matrix(epoch, writer_validation, foldername_to_save_outputs, dataset_validation, iou_threshold = 0.5)
 
         print("Saving the model...")
-        #net_instance.save_model(net, epoch)
+        #net_instance.save_model(net, foldername_to_save_outputs, epoch)
         
     epoch += 1
         

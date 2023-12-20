@@ -137,8 +137,8 @@ def get_transform(train):
       transforms.append(OurColorJitter(0.125))
       transforms.append(OurRandomAdjustSharpness(0.5))
       transforms.append(OurRandomGamma(0.5))
-      #transforms.append(OurGaussianNoise(0.5))
-      #transforms.append(OurRandomErasing(0.5))
+      transforms.append(OurGaussianNoise(0.5))
+      transforms.append(OurRandomErasing(0.5))
     transforms.append(ToTensor())
     if train:
       transforms.append(RandomHorizontalFlip(0.5))

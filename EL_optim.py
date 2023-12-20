@@ -10,7 +10,8 @@ class Optimizer:
                 weight_decay, # L2 penalty
                 momentum,
                 dampening,
-                nesterov):
+                nesterov,
+                scheduler_gamma):
         
         self.net_param = net_param
         self.optim_name = optim_name
@@ -21,6 +22,7 @@ class Optimizer:
         self.momentum = momentum
         self.dampening = dampening
         self.nesterov = nesterov
+        self.scheduler_gamma = scheduler_gamma
 
         # Adadelta
         if optim_name == 'Adadelta':
@@ -72,6 +74,13 @@ class Optimizer:
                 self.optim = torch.optim.SGD(params = self.net_param, lr=self.lr, momentum=self.momentum, 
                     dampening=self.dampening, weight_decay=self.weight_decay, 
                     nesterov=self.nesterov)
+        
+        self.lr_scheduler = torch.optim.lr_scheduler.ExponentialLR(self.optim, gamma=self.scheduler_gamma)
             
+    def get_lr_scheduler(self):
+        return self.lr_scheduler
+        
     def get_optim(self):
         return self.optim
+
+    

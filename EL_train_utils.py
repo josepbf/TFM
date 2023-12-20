@@ -4,7 +4,7 @@ import torch
 
 from EL_utils import MetricLogger, SmoothedValue, reduce_dict
 
-def train_one_epoch(model, optimizer, data_loader, device, epoch, print_freq, iteration, writer):
+def train_one_epoch(model, optimizer, lr_scheduler, data_loader, device, epoch, print_freq, iteration, writer):
     model.train()
     metric_logger = MetricLogger(delimiter="  ")
     #metric_logger.add_meter('lr', SmoothedValue(window_size=1, fmt='{value:.6f}'))
@@ -50,6 +50,8 @@ def train_one_epoch(model, optimizer, data_loader, device, epoch, print_freq, it
         optimizer.zero_grad()
         losses.backward()
         optimizer.step()
+
+        lr_scheduler.step()
 
         #metric_logger.update(loss=losses_reduced, **loss_dict_reduced)
         #metric_logger.update(lr=optimizer.param_groups[0]["lr"])
