@@ -7,11 +7,7 @@ import torchvision.transforms as transforms
 import torchvision.transforms.functional as TF
 from torchvision.transforms import functional as F
 from torchvision import transforms as T
-from torchvision.transforms import GaussianBlur
-from torchvision.transforms.v2 import RandomEqualize, RandomAutocontrast
-from torchvision.transforms import ColorJitter
-from torchvision.transforms import RandomAdjustSharpness
-from torchvision.transforms import RandomErasing
+from torchvision.transforms.v2 import GaussianBlur, RandomEqualize, RandomAutocontrast, ColorJitter, RandomAdjustSharpness, RandomErasing
 import scipy.io
 
 import PIL
