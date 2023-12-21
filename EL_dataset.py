@@ -8,7 +8,7 @@ import torchvision.transforms.functional as TF
 from torchvision.transforms import functional as F
 from torchvision import transforms as T
 from torchvision.transforms import GaussianBlur
-from torchvision.transforms import RandomEqualize
+from torchvision.transforms.v2 import RandomEqualize, RandomAutocontrast
 from torchvision.transforms import ColorJitter
 from torchvision.transforms import RandomAdjustSharpness
 from torchvision.transforms import RandomErasing
@@ -27,12 +27,30 @@ import os
 
 from ast import literal_eval as make_tuple
 
-# TODO: Check this: https://pytorch.org/vision/main/transforms.html
+# TODO: Change imports to torchvision.transforms.v2 https://pytorch.org/vision/main/transforms.html
 
 class ToTensor(object):
     def __call__(self, image, target):
         image = F.to_tensor(image)
         return image, target
+
+class OurRandomAutocontrast(object):
+  def __init__(self, prob):
+    self.prob = prob
+
+  def __call__(self, image, target):
+    randomautocontrast = RandomAutocontrast(self.prob)
+    image = randomautocontrast(image)
+    return image, target
+
+class OurRandomEqualize(object):
+  def __init__(self, prob):
+    self.prob = prob
+
+  def __call__(self, image, target):
+    randomequalize = RandomEqualize(self.prob)
+    image = randomequalize(image)
+    return image, target
 
 class OurRandomErasing(object):
   def __init__(self, prob):
@@ -137,12 +155,14 @@ def get_transform(train):
       transforms.append(OurColorJitter(0.125))
       transforms.append(OurRandomAdjustSharpness(0.5))
       transforms.append(OurRandomGamma(0.5))
-      transforms.append(OurRandomErasing(0.5))
+      transforms.append(OurRandomEqualize(0.5))
+      transforms.append(OurRandomAutocontrast(0.5))
     transforms.append(ToTensor())
     if train:
       transforms.append(RandomHorizontalFlip(0.5))
       transforms.append(RandomVerticalFlip(0.5))
       transforms.append(OurGaussianNoise(0.5))
+      transforms.append(OurRandomErasing(0.5))
     return Compose(transforms)
 
 def collate_fn(batch):
