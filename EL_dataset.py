@@ -144,22 +144,33 @@ class Compose(object):
             image, target = t(image, target)
         return image, target
 
-def get_transform(train):
-    transforms = []
-    if train:
+def get_transform(train, gaussian_blur, color_jitter, adjust_sharpness, random_gamma, random_equalize, 
+                      autocontrast, horizontal_flip, vertical_flip, gaussian_noise, random_erasing):
+  transforms = []
+  if train:
+    if gaussian_blur:
       transforms.append(OurGaussianBlur(0.125))
+    if color_jitter:
       transforms.append(OurColorJitter(0.125))
+    if adjust_sharpness:
       transforms.append(OurRandomAdjustSharpness(0.5))
+    if random_gamma:
       transforms.append(OurRandomGamma(0.5))
+    if random_equalize:
       transforms.append(OurRandomEqualize(0.5))
+    if autocontrast:
       transforms.append(OurRandomAutocontrast(0.5))
-    transforms.append(ToTensor())
-    if train:
+  transforms.append(ToTensor())
+  if train:
+    if horizontal_flip:
       transforms.append(RandomHorizontalFlip(0.5))
+    if vertical_flip:
       transforms.append(RandomVerticalFlip(0.5))
+    if gaussian_noise:
       transforms.append(OurGaussianNoise(0.5))
+    if random_erasing:
       transforms.append(OurRandomErasing(0.5))
-    return Compose(transforms)
+  return Compose(transforms)
 
 def collate_fn(batch):
     return tuple(zip(*batch))

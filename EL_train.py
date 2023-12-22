@@ -53,18 +53,21 @@ parser.add_argument("--nesterov", type=int, default=0, help="0 is off, 1 is on")
 parser.add_argument("-g", "--scheduler_gamma", type=float, default=0.99, help="gamma value for exp decay learning rate scheduler")
 
 # Data augmentation
-parser.add_argument("--gaussian_blur", type=int, default=0, help="gaussian_blur")
-parser.add_argument("--color_jitter", type=int, default=0, help="color_jitter")
-parser.add_argument("--horizontal_flip", type=int, default=0, help="horizontal_flip")
-parser.add_argument("--vertical_flip", type=int, default=0, help="vertical_flip")
-parser.add_argument("--adjust_sharpness", type=int, default=0, help="adjust_sharpness")
-parser.add_argument("--random_gamma", type=int, default=0, help="random_gamma")
-parser.add_argument("--gaussian_noise", type=int, default=0, help="gaussian_noise")
-parser.add_argument("--random_erasing", type=int, default=0, help="random_erasing")
+parser.add_argument("--gaussian_blur", type=int, default=1, help="gaussian_blur")
+parser.add_argument("--color_jitter", type=int, default=1, help="color_jitter")
+parser.add_argument("--horizontal_flip", type=int, default=1, help="horizontal_flip")
+parser.add_argument("--vertical_flip", type=int, default=1, help="vertical_flip")
+parser.add_argument("--adjust_sharpness", type=int, default=1, help="adjust_sharpness")
+parser.add_argument("--random_gamma", type=int, default=1, help="random_gamma")
+parser.add_argument("--gaussian_noise", type=int, default=1, help="gaussian_noise")
+parser.add_argument("--random_erasing", type=int, default=1, help="random_erasing")
+parser.add_argument("--random_equalize", type=int, default=1, help="random_equalize")
+parser.add_argument("--autocontrast", type=int, default=1, help="autocontrast")
 
 # Model
 parser.add_argument("--model_name", type=str, default='FasterRCNN_ResNet-50-FPN')
 parser.add_argument("--trainable_backbone_layers", type=int, default=3)
+parser.add_argument("--label_smoothing", type=float, default=0.1, help="gamma value for exp decay learning rate scheduler")
 
 args = parser.parse_args()
 config = vars(args)
@@ -102,7 +105,6 @@ scheduler_gamma = config['scheduler_gamma']
 # Hyper-parameters 
 num_epochs = config['num_epochs']
 batch_size = config['batch_size']
-#label_smoothing = config['label_smoothing']
 
 # Data Augmentation
 gaussian_blur = int_to_boolean(config['gaussian_blur'])
@@ -113,12 +115,18 @@ adjust_sharpness = int_to_boolean(config['adjust_sharpness'])
 random_gamma = int_to_boolean(config['random_gamma'])
 gaussian_noise = int_to_boolean(config['gaussian_noise'])
 random_erasing = int_to_boolean(config['random_erasing'])
+random_equalize = int_to_boolean(config['random_equalize'])
+autocontrast = int_to_boolean(config['autocontrast'])
 
 # Model name
 model_name = config['model_name']
 trainable_backbone_layers = config['trainable_backbone_layers']
-net_instance = Model(model_name=model_name, trainable_backbone_layers=trainable_backbone_layers)
+label_smoothing = config['label_smoothing']
+net_instance = Model(model_name=model_name, trainable_backbone_layers=trainable_backbone_layers, label_smoothing = label_smoothing)
+if label_smoothing > 0:
+    net_instance = net_instance.add_label_smoothing()
 net = net_instance.get_model()
+
 print("Model layers:")
 print(net)
 
@@ -127,10 +135,30 @@ if seed != 0:
     torch.manual_seed(seed)
 
 # Dataset
-dataset_train = PVDefectsDS(get_transform(train=True), train_val_test = 0)
-dataset_train_no_augmentation = PVDefectsDS(get_transform(train=False), train_val_test = 0)
-dataset_validation = PVDefectsDS(get_transform(train=False), train_val_test = 1)
-dataset_test = PVDefectsDS(get_transform(train=False), train_val_test = 2)
+dataset_train = PVDefectsDS(get_transform(train=True, gaussian_blur = gaussian_blur, 
+                            color_jitter=color_jitter, adjust_sharpness=adjust_sharpness, 
+                            random_gamma=random_gamma, random_equalize=random_equalize, 
+                            autocontrast=autocontrast, horizontal_flip=horizontal_flip, 
+                            vertical_flip=vertical_flip, gaussian_noise=gaussian_noise, 
+                            random_erasing=random_erasing), train_val_test = 0)
+dataset_train_no_augmentation = PVDefectsDS(get_transform(train=False, gaussian_blur = gaussian_blur, 
+                            color_jitter=color_jitter, adjust_sharpness=adjust_sharpness, 
+                            random_gamma=random_gamma, random_equalize=random_equalize, 
+                            autocontrast=autocontrast, horizontal_flip=horizontal_flip, 
+                            vertical_flip=vertical_flip, gaussian_noise=gaussian_noise, 
+                            random_erasing=random_erasing), train_val_test = 0)
+dataset_validation = PVDefectsDS(get_transform(train=False, gaussian_blur = gaussian_blur, 
+                            color_jitter=color_jitter, adjust_sharpness=adjust_sharpness, 
+                            random_gamma=random_gamma, random_equalize=random_equalize, 
+                            autocontrast=autocontrast, horizontal_flip=horizontal_flip, 
+                            vertical_flip=vertical_flip, gaussian_noise=gaussian_noise, 
+                            random_erasing=random_erasing), train_val_test = 1)
+dataset_test = PVDefectsDS(get_transform(train=False, gaussian_blur = gaussian_blur, 
+                            color_jitter=color_jitter, adjust_sharpness=adjust_sharpness, 
+                            random_gamma=random_gamma, random_equalize=random_equalize, 
+                            autocontrast=autocontrast, horizontal_flip=horizontal_flip, 
+                            vertical_flip=vertical_flip, gaussian_noise=gaussian_noise, 
+                            random_erasing=random_erasing), train_val_test = 2)
 
 # Handling data imbalance
 sampler_instance = Sampler(dataset = dataset_train)
