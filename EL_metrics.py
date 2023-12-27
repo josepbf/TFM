@@ -4,7 +4,7 @@ import torch
 import numpy
 
 class Writer:
-   def __init__(self, name_experiment, train_or_val, config):
+   def __init__(self, name_experiment, train_or_val, config, continue_trainings, id_run):
       self.name_experiment = name_experiment
       self.train_or_val = train_or_val # 0 for train, 1 for val
       if len(self.name_experiment) == 0:
@@ -16,8 +16,10 @@ class Writer:
       else:
          self.folder_name = 'val'
 
-      wandb.init(project=name_experiment, config = config)
-
+      if continue_trainings:
+         wandb.init(project=name_experiment, config = config, id=id_run, resume="must")
+      else:
+         wandb.init(project=name_experiment, config = config)
 
    def store_metric(self, metric_name, scalar, step_name, step):
       wandb.log({metric_name: scalar, step_name: step})
