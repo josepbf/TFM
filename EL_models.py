@@ -81,13 +81,10 @@ class Model:
     def get_model(self):
         return self.model
 
-    def load_model(self, name):
-        self.model = torch.load("./models_saved/" + str(name) + ".pth")
+    def load_model(self, experiment_name, load_model_name):
+        self.model = torch.load("./states_saved/" + experiment_name + "/saved_models/" + str(load_model_name) + ".pth")
+        return self.model
 
-    def save_model(self, net, epoch):
-        now = datetime.now()
-        dt_string = now.strftime("%d_%m_%Y_%H_%M_%S")
-        name_to_save = str("./" + self.model_name + "_epoch_" + str(epoch) + dt_string + ".pth")
-        torch.save(net, name_to_save)        
-
-        return classification_loss, box_loss
+    def save_model(self, experiment_name, net, epoch):
+        name_to_save = str("./states_saved/" + experiment_name + "/saved_models/" + self.model_name + "_epoch_" + str(epoch) + ".pth")
+        torch.save(net, name_to_save)

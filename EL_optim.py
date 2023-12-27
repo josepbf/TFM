@@ -24,6 +24,8 @@ class Optimizer:
         self.nesterov = nesterov
         self.scheduler_gamma = scheduler_gamma
 
+        self.lr_scheduler_name = "lr_scheduler"
+
         # Adadelta
         if self.optim_name == 'Adadelta':
             if optim_default:
@@ -83,13 +85,16 @@ class Optimizer:
     def get_optim(self):
         return self.optim
 
-    def load_optim(self, name):
-        self.optim = self.optim.load_state_dict("./optim_saved/" + str(name) + ".pt", strict=False)
+    def load_optim(self, experiment_name, load_optim_name):
+        name_to_open_optim = str(load_optim_name + ".pt")
+        self.optim = self.optim.load_state_dict(torch.load(str("./states_saved/" + experiment_name + "/saved_opitm/" + name_to_open_optim)), strict=False)
 
-    def save_optim(self, optim, epoch):
-        now = datetime.now()
-        dt_string = now.strftime("%d_%m_%Y_%H_%M_%S")
-        name_to_save = str("./" + self.optim_name + "_epoch_" + str(epoch) + dt_string + ".pt")
-        torch.save(self.optim.state_dict(), name_to_save)
+    def load_lr_scheduler(self, experiment_name, load_lr_name):
+        name_to_open_lr_scheduler = str(load_lr_name + ".pt")
+        self.lr_scheduler = self.lr_scheduler.load_state_dict(torch.load(str("./states_saved/" + experiment_name + "/saved_lr/" + name_to_open_lr_scheduler)), strict=False)
 
-    
+    def save_optim_and_scheduler(self, experiment_name, optim, lr_scheduler, epoch):
+        name_to_save_optim = str("./states_saved/" + experiment_name + "/saved_opitm/" + self.optim_name + "_epoch_" + str(epoch) + ".pt")
+        torch.save(optim.state_dict(), name_to_save_optim)
+        name_to_save_lr_scheduler = str("./states_saved/" + experiment_name + "/saved_lr/" + self.lr_scheduler_name + "_epoch_" + str(epoch) + ".pt")
+        torch.save(lr_scheduler.state_dict(), name_to_save_lr_scheduler)
