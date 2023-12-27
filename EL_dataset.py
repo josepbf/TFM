@@ -23,8 +23,6 @@ import os
 
 from ast import literal_eval as make_tuple
 
-# TODO: Change imports to torchvision.transforms.v2 https://pytorch.org/vision/main/transforms.html
-
 class ToTensor(object):
     def __call__(self, image, target):
         image = F.to_tensor(image)
