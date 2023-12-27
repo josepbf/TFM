@@ -28,25 +28,31 @@ parser = argparse.ArgumentParser(description="EL training",
 
 # Reproducibility and device configuration
 parser.add_argument("-D", "--deterministic", action='store_true', help="deterministic (slower)")
-parser.add_argument("-W", "--num_workers", type=int, default=4, help="number of workers in data loader")
 parser.add_argument("-P", "--pin_memory", action='store_true', help="pin memory in data loader")
 parser.add_argument("--seed", type=int, default=0, help="random seed")
 
-# Saving
-parser.add_argument("-E", "--save_model_epochs", type=int, default=0, help="save the model every this number of epochs")
-parser.add_argument("-O", "--save_optim", action='store_true', help="save the optimizer state at the end")
-#parser.add_argument("name", help="Name to be saved")
+# Saving and continue trainings
+parser.add_argument("--experiment_name", type=str, default="no_default", help="name of the experiment, don't repeat a name already used if you dont continue that experiment")
+parser.add_argument("-E", "--save_model_and_optim_epochs", type=int, default=2, help="save the model and optim every this number of epochs")
+parser.add_argument("--run_id", type=str, default='no_id', help="WandB run id")
+parser.add_argument("--continue_trainings", type=int, default=0, help="0 new trainings, 1 continue, need to provide run_id")
+parser.add_argument("--epoch_continue_from", type = int, default= 0, help="continue from epoch number X")
+parser.add_argument("--load_model_name", type=str, default="no_default", help="name of the model to load")
+parser.add_argument("--load_optim_name", type=str, default="no_default", help="name of the optim to load")
+parser.add_argument("--load_lr_name", type=str, default="no_default", help="name of the lr to load")
 
 # Training param
-parser.add_argument("-e", "--num_epochs", type=int, default=7, help="number of epochs")
+parser.add_argument("--evaluate_every_epochs", type=int, default=5, help="evaluate every X epochs")
+parser.add_argument("-e", "--num_epochs", type=int, default=2, help="number of epochs")
 parser.add_argument("-b", "--batch_size", type=int, default=8, help="batch size")
+parser.add_argument("-W", "--num_workers", type=int, default=4, help="number of workers in data loader")
 
 # Optimizer hyper-param
 parser.add_argument("--optim_name", type=str, default='Adam')
 parser.add_argument("--optim_default", type=int, default=0, help="0 is No default, 1 is default")
 parser.add_argument("-l", "--learning_rate", type=float, default=0.001, help="learning rate")
 parser.add_argument("-r ", "--rho", type=float, default=0.9)
-parser.add_argument("-w", "--weight_decay", type=float, default=0, help="weight decay (L2 regularization)")
+parser.add_argument("-w", "--weight_decay", type=float, default=1e-5, help="weight decay (L2 regularization)")
 parser.add_argument("-m ", "--momentum", type=float, default=0.9, help="momentum of the learning")
 parser.add_argument("--dampening", type=float, default=0)
 parser.add_argument("--nesterov", type=int, default=0, help="0 is off, 1 is on")
@@ -63,6 +69,9 @@ parser.add_argument("--gaussian_noise", type=int, default=1, help="gaussian_nois
 parser.add_argument("--random_erasing", type=int, default=1, help="random_erasing")
 parser.add_argument("--random_equalize", type=int, default=1, help="random_equalize")
 parser.add_argument("--autocontrast", type=int, default=1, help="autocontrast")
+
+# Data imbalance
+parser.add_argument("--data_imbalance_handler", type=int, default=1, help="0 is off, 1 is on")
 
 # Model
 parser.add_argument("--model_name", type=str, default='FasterRCNN_ResNet-50-FPN')
@@ -82,6 +91,17 @@ np.random.seed(seed)
 if config['deterministic']:
     torch.backends.cudnn.benchmark = False
     torch.backends.cudnn.deterministic = True
+
+# New params
+experiment_name = str(config['experiment_name'])
+evaluate_every_epochs = config['evaluate_every_epochs']
+epoch_continue_from = config['epoch_continue_from']
+continue_trainings = int_to_boolean(config['continue_trainings'])
+run_id = config['run_id']
+save_model_and_optim_epochs = config['save_model_and_optim_epochs']
+load_model_name = str(config['load_model_name'])
+load_optim_name = str(config['load_optim_name'])
+load_lr_name = str(config['load_lr_name'])
 
 # Device configuration
 torch.cuda.empty_cache()
@@ -122,8 +142,15 @@ autocontrast = int_to_boolean(config['autocontrast'])
 model_name = config['model_name']
 trainable_backbone_layers = config['trainable_backbone_layers']
 label_smoothing = config['label_smoothing']
-net_instance = Model(model_name=model_name, trainable_backbone_layers=trainable_backbone_layers, label_smoothing = label_smoothing)
-net = net_instance.get_model()
+net_object = Model(model_name=model_name, trainable_backbone_layers=trainable_backbone_layers, label_smoothing = label_smoothing)
+net = net_object.get_model()
+
+# Load Model if continue training
+if continue_trainings:
+    net = net_object.load_model(experiment_name, load_model_name):
+
+# Data imbalance
+data_imbalance_handler = int_to_boolean(config['data_imbalance_handler'])
 
 print("Model layers:")
 print(net)
@@ -158,22 +185,21 @@ dataset_test = PVDefectsDS(get_transform(train=False, gaussian_blur = gaussian_b
                             vertical_flip=vertical_flip, gaussian_noise=gaussian_noise, 
                             random_erasing=random_erasing), train_val_test = 2)
 
-# Handling data imbalance
-sampler_instance = Sampler(dataset = dataset_train)
-sampler = sampler_instance.get_WeightedRandomSampler()
+# Handling data imbalance and Loading dataset
+if data_imbalance_handler:
+    sampler_object = Sampler(dataset = dataset_train)
+    sampler = sampler_object.get_WeightedRandomSampler()
+    trainloader = DataLoader(dataset_train, sampler = sampler, batch_size=batch_size, num_workers=num_workers, shuffle=False, collate_fn = collate_fn)
+else:
+    trainloader = DataLoader(dataset_train, batch_size=batch_size, num_workers=num_workers, shuffle=False, collate_fn = collate_fn)
 
-# Loading dataset
-trainloader = DataLoader(dataset_train, sampler = sampler, batch_size=batch_size, num_workers=num_workers, shuffle=False, collate_fn = collate_fn)
 trainloader_no_augmentation = DataLoader(dataset_train_no_augmentation, batch_size=batch_size, num_workers=num_workers, shuffle=False, collate_fn = collate_fn)
 validationloader = DataLoader(dataset_validation, batch_size=batch_size, num_workers=num_workers, shuffle=False, collate_fn = collate_fn)
 testloader = DataLoader(dataset_test, batch_size=batch_size, num_workers=num_workers, shuffle=False, collate_fn = collate_fn)
 
-# TODO: Visualise the distribution of our DataLoader batches
-# Source: https://towardsdatascience.com/demystifying-pytorchs-weightedrandomsampler-by-example-a68aceccb452
-
 # Loss function 
 net_params = [p for p in net.parameters() if p.requires_grad]
-optimizer_instance = Optimizer(net_params,
+optimizer_object = Optimizer(net_params,
                 optim_name,
                 optim_default,
                 learning_rate,
@@ -183,15 +209,30 @@ optimizer_instance = Optimizer(net_params,
                 dampening,
                 nesterov,
                 scheduler_gamma)   
-optimizer = optimizer_instance.get_optim()
-lr_scheduler = optimizer_instance.get_lr_scheduler()
+optimizer = optimizer_object.get_optim()
+lr_scheduler = optimizer_object.get_lr_scheduler()
+
+# Load Optim and lr_scheduler if continue training
+if continue_trainings:
+    optimizer = optimizer_object.load_optim(experiment_name, load_optim_name)
+    lr_scheduler = optimizer_object.load_lr_scheduler(experiment_name, load_lr_name)
 
 # Metrics
-writer_training = Writer('',0, config)
-writer_validation = Writer('',1, config)
+writer_training = Writer(experiment_name, 0, config, continue_trainings, id_run)
+writer_validation = Writer(experiment_name, 1, config, continue_trainings, id_run)
+
+# Create folders for saving paths
+path = str("./states_saved/" + str(experiment_name))
+if not continue_trainings:
+    saved_models_path = str(path + "/saved_models")
+    saved_optims_path = str(path + "/saved_opitm")
+    saved_lr_path = str(path + "/saved_lr")
+    os.makedirs(saved_models_path, exist_ok=True)
+    os.makedirs(saved_optims_path, exist_ok=True)
+    os.makedirs(saved_lr_path, exist_ok=True)
 
 # Training
-epoch = 0
+epoch = epoch_continue_from
 iteration = 0
 now = datetime.now()
 dt_string = now.strftime("%d_%m_%Y_%H_%M_%S")
@@ -202,21 +243,25 @@ while epoch != num_epochs:
     print("Starting training num." + str(epoch))
     # train for one epoch, printing every 10 iterations
     iteration = len(trainloader)*epoch
-    train_one_epoch(net, optimizer, lr_scheduler, trainloader, device, epoch, print_freq=1, iteration=iteration, writer = writer_training)
+    train_one_epoch(net, optimizer, trainloader, device, epoch, print_freq=1, iteration=iteration, writer = writer_training)
     loss_one_epoch_val(net, optimizer, validationloader, device, epoch, print_freq=1, iteration=iteration, writer = writer_validation)
 
     foldername_to_save_outputs = str("./runs/run_outputs_" + dt_string + "/epoch_" + str(epoch))
-    
-    if epoch == 3 or epoch == 6:
+        
+    # Log lr
+    writer.store_metric(str('lr'), lr_scheduler.get_last_lr(), 'epoch', epoch)
+    lr_scheduler.step()
+
+    if epoch == 0 or epoch % evaluate_every_epochs == 0:
         print("Starting evaluation num. " + str(epoch))
         
         # evaluate on the train dataset
         print("Starting train data evaluation...")
-        evaluate_engine(net,trainloader_no_augmentation,device, epoch, writer_training, foldername_to_save_outputs)
+        evaluate_engine(net,trainloader_no_augmentation, device, epoch, writer_training, foldername_to_save_outputs)
         
         # evaluate on the validation dataset
         print("Starting validation data evaluation...")
-        evaluate_engine(net,validationloader,device, epoch, writer_validation, foldername_to_save_outputs)
+        evaluate_engine(net,validationloader, device, epoch, writer_validation, foldername_to_save_outputs)
 
         print("Computing confusion matrix training...")
         compute_confusion_matrix(epoch, writer_training, foldername_to_save_outputs, dataset_train_no_augmentation, iou_threshold = 0.5)
@@ -224,9 +269,13 @@ while epoch != num_epochs:
         print("Computing confusion matrix validation...")
         compute_confusion_matrix(epoch, writer_validation, foldername_to_save_outputs, dataset_validation, iou_threshold = 0.5)
 
-        print("Saving the model...")
-        #net_instance.save_model(net, foldername_to_save_outputs, epoch)
-        
+    if epoch == 0 or epoch % save_model_and_optim_epochs == 0:
+        print("Saving the model at epoch num. " + str(epoch))
+        net_object.save_model(experiment_name, net, epoch)
+
+        print("Saving optimizer and lr scheduler...")
+        optimizer_object.save_optim_and_scheduler(experiment_name, optimizer, lr_scheduler, epoch)
+
     epoch += 1
         
 print("That's it!")
