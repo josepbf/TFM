@@ -147,7 +147,7 @@ net = net_object.get_model()
 
 # Load Model if continue training
 if continue_trainings:
-    net = net_object.load_model(experiment_name, load_model_name):
+    net = net_object.load_model(experiment_name, load_model_name)
 
 # Data imbalance
 data_imbalance_handler = int_to_boolean(config['data_imbalance_handler'])
