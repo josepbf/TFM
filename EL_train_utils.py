@@ -39,9 +39,6 @@ def train_one_epoch(model, optimizer, data_loader, device, epoch, print_freq, it
         writer.store_metric(str('Loss_' + writer.get_folder_name() + '/loss_objectness'), loss_objectness, str('iteration_' + writer.get_folder_name()), iteration)
         writer.store_metric(str('Loss_' + writer.get_folder_name() + '/loss_rpn_box_reg'), loss_rpn_box_reg, str('iteration_' + writer.get_folder_name()), iteration)
         
-        learning_rate = optimizer.param_groups[0]["lr"]
-        writer.store_metric('LearningRate/lr', learning_rate, str('iteration_' + writer.get_folder_name()), iteration)
-
         if not math.isfinite(loss_value):
             print("Loss is {}, stopping training".format(loss_value))
             print(loss_dict_reduced)

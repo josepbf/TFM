@@ -147,6 +147,7 @@ net = net_object.get_model()
 
 # Load Model if continue training
 if continue_trainings:
+    print("Loading " + str(load_model_name))
     net = net_object.load_model(experiment_name, load_model_name)
 
 # Data imbalance
@@ -214,7 +215,9 @@ lr_scheduler = optimizer_object.get_lr_scheduler()
 
 # Load Optim and lr_scheduler if continue training
 if continue_trainings:
+    print("Loading " + str(load_optim_name))
     optimizer = optimizer_object.load_optim(experiment_name, load_optim_name)
+    print("Loading " + str(load_lr_name))
     lr_scheduler = optimizer_object.load_lr_scheduler(experiment_name, load_lr_name)
 
 # Metrics
