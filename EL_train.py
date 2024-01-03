@@ -218,8 +218,8 @@ if continue_trainings:
     lr_scheduler = optimizer_object.load_lr_scheduler(experiment_name, load_lr_name)
 
 # Metrics
-writer_training = Writer(experiment_name, 0, config, continue_trainings, id_run)
-writer_validation = Writer(experiment_name, 1, config, continue_trainings, id_run)
+writer_training = Writer(experiment_name, 0, config, continue_trainings, run_id)
+writer_validation = Writer(experiment_name, 1, config, continue_trainings, run_id)
 
 # Create folders for saving paths
 path = str("./states_saved/" + str(experiment_name))
