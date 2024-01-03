@@ -87,16 +87,14 @@ class Optimizer:
 
     def load_optim(self, experiment_name, load_optim_name):
         name_to_open_optim = str(load_optim_name + ".pt")
-        print(name_to_open_optim)
-        self.optim = self.optim.load_state_dict(torch.load(str("./states_saved/" + experiment_name + "/saved_opitm/" + name_to_open_optim)))
-        print(self.optim)
+        self.optim.load_state_dict(torch.load(str("./states_saved/" + experiment_name + "/saved_opitm/" + name_to_open_optim)))
         return self.optim
-
+        
     def load_lr_scheduler(self, experiment_name, load_lr_name):
         name_to_open_lr_scheduler = str(load_lr_name + ".pt")
-        self.lr_scheduler = self.lr_scheduler.load_state_dict(torch.load(str("./states_saved/" + experiment_name + "/saved_lr/" + name_to_open_lr_scheduler)))
+        self.lr_scheduler.load_state_dict(torch.load(str("./states_saved/" + experiment_name + "/saved_lr/" + name_to_open_lr_scheduler)))
         return self.lr_scheduler
-        
+
     def save_optim_and_scheduler(self, experiment_name, optim, lr_scheduler, epoch):
         name_to_save_optim = str("./states_saved/" + experiment_name + "/saved_opitm/" + self.optim_name + "_epoch_" + str(epoch) + ".pt")
         torch.save(optim.state_dict(), name_to_save_optim)
