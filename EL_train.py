@@ -249,7 +249,7 @@ while epoch != num_epochs:
     foldername_to_save_outputs = str("./runs/run_outputs_" + dt_string + "/epoch_" + str(epoch))
         
     # Log lr
-    writer.store_metric(str('lr'), lr_scheduler.get_last_lr(), 'epoch', epoch)
+    writer_training.store_metric(str('lr'), lr_scheduler.get_last_lr(), 'epoch', epoch)
     lr_scheduler.step()
 
     if epoch == 0 or epoch % evaluate_every_epochs == 0:
