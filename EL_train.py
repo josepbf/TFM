@@ -59,16 +59,16 @@ parser.add_argument("--nesterov", type=int, default=0, help="0 is off, 1 is on")
 parser.add_argument("-g", "--scheduler_gamma", type=float, default=0.99, help="gamma value for exp decay learning rate scheduler")
 
 # Data augmentation
-parser.add_argument("--gaussian_blur", type=int, default=1, help="gaussian_blur")
-parser.add_argument("--color_jitter", type=int, default=1, help="color_jitter")
-parser.add_argument("--horizontal_flip", type=int, default=1, help="horizontal_flip")
-parser.add_argument("--vertical_flip", type=int, default=1, help="vertical_flip")
-parser.add_argument("--adjust_sharpness", type=int, default=1, help="adjust_sharpness")
-parser.add_argument("--random_gamma", type=int, default=1, help="random_gamma")
-parser.add_argument("--gaussian_noise", type=int, default=1, help="gaussian_noise")
-parser.add_argument("--random_erasing", type=int, default=1, help="random_erasing")
-parser.add_argument("--random_equalize", type=int, default=1, help="random_equalize")
-parser.add_argument("--autocontrast", type=int, default=1, help="autocontrast")
+parser.add_argument("--gaussian_blur", type=int, default=0, help="gaussian_blur")
+parser.add_argument("--color_jitter", type=int, default=0, help="color_jitter")
+parser.add_argument("--horizontal_flip", type=int, default=0, help="horizontal_flip")
+parser.add_argument("--vertical_flip", type=int, default=0, help="vertical_flip")
+parser.add_argument("--adjust_sharpness", type=int, default=0, help="adjust_sharpness")
+parser.add_argument("--random_gamma", type=int, default=0, help="random_gamma")
+parser.add_argument("--gaussian_noise", type=int, default=0, help="gaussian_noise")
+parser.add_argument("--random_erasing", type=int, default=0, help="random_erasing")
+parser.add_argument("--random_equalize", type=int, default=0, help="random_equalize")
+parser.add_argument("--autocontrast", type=int, default=0, help="autocontrast")
 
 # Data imbalance
 parser.add_argument("--data_imbalance_handler", type=int, default=1, help="0 is off, 1 is on")
@@ -252,7 +252,9 @@ while epoch != num_epochs:
     foldername_to_save_outputs = str("./runs/run_outputs_" + dt_string + "/epoch_" + str(epoch))
         
     # Log lr
-    writer_training.store_metric(str('lr'), lr_scheduler.get_last_lr(), 'epoch', epoch)
+    print("lr_scheduler.get_last_lr()")
+    print(lr_scheduler.get_last_lr())
+    writer_training.store_metric(str('lr'), lr_scheduler.get_last_lr()[0], 'epoch', epoch)
     lr_scheduler.step()
 
     if epoch == 0 or epoch % evaluate_every_epochs == 0:
