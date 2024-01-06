@@ -85,6 +85,6 @@ class Model:
         self.model = torch.load("./states_saved/" + experiment_name + "/saved_models/" + str(load_model_name) + ".pth")
         return self.model
 
-    def save_model(self, experiment_name, net, epoch):
-        name_to_save = str("./states_saved/" + experiment_name + "/saved_models/" + self.model_name + "_epoch_" + str(epoch) + ".pth")
+    def save_model(self, experiment_name, run_name, net, epoch):
+        name_to_save = str("./states_saved/" + experiment_name + "/saved_models/" + self.model_name + "_" + run_name + "_epoch_" + str(epoch) + ".pth")
         torch.save(net, name_to_save)

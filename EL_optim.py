@@ -95,8 +95,8 @@ class Optimizer:
         self.lr_scheduler.load_state_dict(torch.load(str("./states_saved/" + experiment_name + "/saved_lr/" + name_to_open_lr_scheduler)))
         return self.lr_scheduler
 
-    def save_optim_and_scheduler(self, experiment_name, optim, lr_scheduler, epoch):
-        name_to_save_optim = str("./states_saved/" + experiment_name + "/saved_opitm/" + self.optim_name + "_epoch_" + str(epoch) + ".pt")
+    def save_optim_and_scheduler(self, experiment_name, run_name, optim, lr_scheduler, epoch):
+        name_to_save_optim = str("./states_saved/" + experiment_name + "/saved_opitm/" + self.optim_name + "_" + run_name + "_epoch_" + str(epoch) + ".pt")
         torch.save(optim.state_dict(), name_to_save_optim)
-        name_to_save_lr_scheduler = str("./states_saved/" + experiment_name + "/saved_lr/" + self.lr_scheduler_name + "_epoch_" + str(epoch) + ".pt")
+        name_to_save_lr_scheduler = str("./states_saved/" + experiment_name + "/saved_lr/" + self.lr_scheduler_name + "_" + run_name + "_epoch_" + str(epoch) + ".pt")
         torch.save(lr_scheduler.state_dict(), name_to_save_lr_scheduler)

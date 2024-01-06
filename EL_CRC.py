@@ -15,6 +15,14 @@ def CRC_lambda_threshold_finder(calibration_data, alpha = 0.1)
     - volen el primer threhold en el que fnr =< 0.091
     - més petit vol dir que començem per threhold 1 i anem baixant fins 
     que la fnr empirica sigui més petit o igual 0.091."""
+
+    """
+    lambda1 < lambda2
+    rik1 > risk2
+    1-recall compleix això
+    1-precision compleix això
+    """
+    
     B = 1
     num_samples = len(calibration_data)
     lambda_threshold
