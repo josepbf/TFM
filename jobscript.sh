@@ -28,6 +28,6 @@ nvidia-smi
 
 source ../myVirtEnv/bin/activate
 
-/appl/python/3.11.4/bin/python3.11 EL_train.py --save_model_and_optim_epochs 1 --run_id 0 --continue_trainings 0 --epoch_continue_from 0 --num_epochs 5 --data_imbalance_handler 1 --evaluate_every_epochs 1 --activate_custom_epoch 1 --custom_len_epoch 1000 --experiment_name cutom_iterations_1 --run_name custom_len_1000_iter
+/appl/python/3.11.4/bin/python3.11 EL_train.py --save_model_and_optim_epochs 1 --run_id 0 --continue_trainings 0 --epoch_continue_from 0 --num_epochs 5 --data_imbalance_handler 1 --evaluate_every_epochs 1 --activate_custom_epoch 1 --custom_len_epoch 1000 --experiment_name cutom_iterations_2 --run_name custom_len_1000_iter
 
 deactivate
