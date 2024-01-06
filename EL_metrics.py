@@ -4,7 +4,7 @@ import torch
 import numpy
 
 class Writer:
-   def __init__(self, name_experiment, run_name train_or_val, config, continue_trainings, run_id):
+   def __init__(self, name_experiment, run_name, train_or_val, config, continue_trainings, run_id):
       self.name_experiment = name_experiment
       self.train_or_val = train_or_val # 0 for train, 1 for val
       if len(self.name_experiment) == 0:
