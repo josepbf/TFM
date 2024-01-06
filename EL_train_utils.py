@@ -48,7 +48,7 @@ def train_one_epoch(model, optimizer, data_loader, device, epoch, print_freq, it
         losses.backward()
         optimizer.step()
 
-        if activate_custom_epoch and custom_len_epoch*epoch == itearation:
+        if activate_custom_epoch and custom_len_epoch*epoch == iteration:
                 break
 
         #metric_logger.update(loss=losses_reduced, **loss_dict_reduced)
