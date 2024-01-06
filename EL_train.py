@@ -261,7 +261,7 @@ while epoch != num_epochs:
     else:
         iteration = len(trainloader)*epoch
     
-    train_one_epoch(net, optimizer, trainloader, device, epoch, print_freq=100, iteration=iteration, writer = writer_training, activate_custom_epoch, custom_len_epoch)
+    train_one_epoch(net, optimizer, trainloader, device, epoch, print_freq=100, iteration=iteration, writer = writer_training, activate_custom_epoch = activate_custom_epoch, custom_len_epoch = custom_len_epoch)
     loss_one_epoch_val(net, optimizer, validationloader, device, epoch, print_freq=100, iteration=iteration, writer = writer_validation)
 
     foldername_to_save_outputs = str("./runs/run_outputs_" + dt_string + "/epoch_" + str(epoch))
