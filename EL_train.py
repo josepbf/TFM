@@ -177,24 +177,24 @@ dataset_train = PVDefectsDS(get_transform(train=True, gaussian_blur = gaussian_b
                             autocontrast=autocontrast, horizontal_flip=horizontal_flip, 
                             vertical_flip=vertical_flip, gaussian_noise=gaussian_noise, 
                             random_erasing=random_erasing), train_val_test = 0)
-dataset_train_no_augmentation = PVDefectsDS(get_transform(train=False, gaussian_blur = gaussian_blur, 
-                            color_jitter=color_jitter, adjust_sharpness=adjust_sharpness, 
-                            random_gamma=random_gamma, random_equalize=random_equalize, 
-                            autocontrast=autocontrast, horizontal_flip=horizontal_flip, 
-                            vertical_flip=vertical_flip, gaussian_noise=gaussian_noise, 
-                            random_erasing=random_erasing), train_val_test = 0)
-dataset_validation = PVDefectsDS(get_transform(train=False, gaussian_blur = gaussian_blur, 
-                            color_jitter=color_jitter, adjust_sharpness=adjust_sharpness, 
-                            random_gamma=random_gamma, random_equalize=random_equalize, 
-                            autocontrast=autocontrast, horizontal_flip=horizontal_flip, 
-                            vertical_flip=vertical_flip, gaussian_noise=gaussian_noise, 
-                            random_erasing=random_erasing), train_val_test = 1)
-dataset_test = PVDefectsDS(get_transform(train=False, gaussian_blur = gaussian_blur, 
-                            color_jitter=color_jitter, adjust_sharpness=adjust_sharpness, 
-                            random_gamma=random_gamma, random_equalize=random_equalize, 
-                            autocontrast=autocontrast, horizontal_flip=horizontal_flip, 
-                            vertical_flip=vertical_flip, gaussian_noise=gaussian_noise, 
-                            random_erasing=random_erasing), train_val_test = 2)
+dataset_train_no_augmentation = PVDefectsDS(get_transform(train=False, gaussian_blur = False, 
+                            color_jitter=False, adjust_sharpness=False, 
+                            random_gamma=False, random_equalize=False, 
+                            autocontrast=False, horizontal_flip=False, 
+                            vertical_flip=False, gaussian_noise=False, 
+                            random_erasing=False), train_val_test = 0)
+dataset_validation = PVDefectsDS(get_transform(train=False, gaussian_blur = False, 
+                            color_jitter=False, adjust_sharpness=False, 
+                            random_gamma=False, random_equalize=False, 
+                            autocontrast=False, horizontal_flip=False, 
+                            vertical_flip=False, gaussian_noise=False, 
+                            random_erasing=False), train_val_test = 1)
+dataset_test = PVDefectsDS(get_transform(train=False, gaussian_blur = False, 
+                            color_jitter=False, adjust_sharpness=False, 
+                            random_gamma=False, random_equalize=False, 
+                            autocontrast=False, horizontal_flip=False, 
+                            vertical_flip=False, gaussian_noise=False, 
+                            random_erasing=False), train_val_test = 2)
 
 # Handling data imbalance and Loading dataset
 if data_imbalance_handler:
@@ -202,7 +202,7 @@ if data_imbalance_handler:
     sampler = sampler_object.get_WeightedRandomSampler()
     trainloader = DataLoader(dataset_train, sampler = sampler, batch_size=batch_size, num_workers=num_workers, shuffle=False, collate_fn = collate_fn)
 else:
-    trainloader = DataLoader(dataset_train, batch_size=batch_size, num_workers=num_workers, shuffle=False, collate_fn = collate_fn)
+    trainloader = DataLoader(dataset_train, batch_size=batch_size, num_workers=num_workers, shuffle=True, collate_fn = collate_fn)
 
 trainloader_no_augmentation = DataLoader(dataset_train_no_augmentation, batch_size=batch_size, num_workers=num_workers, shuffle=False, collate_fn = collate_fn)
 validationloader = DataLoader(dataset_validation, batch_size=batch_size, num_workers=num_workers, shuffle=False, collate_fn = collate_fn)
@@ -267,8 +267,6 @@ while epoch != num_epochs:
     foldername_to_save_outputs = str("./runs/run_outputs_" + dt_string + "/epoch_" + str(epoch))
         
     # Log lr
-    print("lr_scheduler.get_last_lr()")
-    print(lr_scheduler.get_last_lr())
     writer_training.store_metric(str('lr'), lr_scheduler.get_last_lr()[0], 'epoch', epoch)
     lr_scheduler.step()
 
