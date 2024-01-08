@@ -45,7 +45,7 @@ parser.add_argument("--load_lr_name", type=str, default="no_default", help="name
 # Training param
 parser.add_argument("--evaluate_every_epochs", type=int, default=5, help="evaluate every X epochs")
 parser.add_argument("-e", "--num_epochs", type=int, default=2, help="number of epochs")
-parser.add_argument("-b", "--batch_size", type=int, default=8, help="batch size")
+parser.add_argument("-b", "--batch_size", type=int, default=4, help="batch size")
 parser.add_argument("-W", "--num_workers", type=int, default=4, help="number of workers in data loader")
 
 # Optimizer hyper-param

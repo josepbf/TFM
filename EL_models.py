@@ -53,28 +53,28 @@ class Model:
         elif self.model_name == 'RetinaNet_ResNet-50-FPN':
             # Constructs a RetinaNet model with a ResNet-50-FPN backbone.
             self.model = torchvision.models.detection.retinanet_resnet50_fpn(
-                weights= 'DEFAULT',
+                pretrained_backbone = pretrained_backbone, 
                 num_classes=num_classes, 
                 trainable_backbone_layers=trainable_backbone_layers) # Valid values are between 0 and 5
 
         elif self.model_name == 'RetinaNet_ResNet-50-FPN_v2':
             # Constructs an improved RetinaNet model with a ResNet-50-FPN backbone.
             self.model = torchvision.models.detection.retinanet_resnet50_fpn_v2(
-                weights= 'DEFAULT',
+                weights_backbone = 'DEFAULT',
                 num_classes=num_classes, 
                 trainable_backbone_layers=trainable_backbone_layers) # Valid values are between 0 and 5
 
         elif self.model_name == 'FCOS':
             # Constructs a FCOS model with a ResNet-50-FPN backbone.
             self.model = torchvision.models.detection.fcos_resnet50_fpn(
-                weights= 'DEFAULT',
+                pretrained_backbone = pretrained_backbone, 
                 num_classes=num_classes, 
                 trainable_backbone_layers=trainable_backbone_layers) # Valid values are between 0 and 5
                 
         elif self.model_name == 'SSD':
              # The SSD300 model is based on the SSD: Single Shot MultiBox Detector paper.
             self.model = torchvision.models.detection.ssd300_vgg16(
-                weights= 'DEFAULT',
+                pretrained_backbone = pretrained_backbone, 
                 num_classes=num_classes, 
                 trainable_backbone_layers=trainable_backbone_layers) # Valid values are between 0 and 5
         
