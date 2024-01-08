@@ -25,7 +25,7 @@ from pycocotools.coco import COCO
 
 from EL_utils import MetricLogger, SmoothedValue, reduce_dict, all_gather
 
-def loss_one_epoch_val(model, optimizer, data_loader, device, epoch, print_freq, iteration, writer):
+def loss_one_epoch_val(model, optimizer, data_loader, device, epoch, print_freq, iteration, writer, model_name):
     metric_logger = MetricLogger(delimiter="  ")
     #metric_logger.add_meter('lr', SmoothedValue(window_size=1, fmt='{value:.6f}'))
     header = 'Epoch: [{}]'.format(epoch)
@@ -48,19 +48,26 @@ def loss_one_epoch_val(model, optimizer, data_loader, device, epoch, print_freq,
         loss_value = losses_reduced.item()
 
         loss = losses_reduced.item()
-        loss_classifier = loss_dict_reduced['loss_classifier'].item()
-        loss_box_reg = loss_dict_reduced['loss_box_reg'].item()
-        loss_objectness = loss_dict_reduced['loss_objectness'].item()
-        loss_rpn_box_reg = loss_dict_reduced['loss_rpn_box_reg'].item()
 
-        writer.store_metric(str('Loss_' + writer.get_folder_name() + '/loss'), loss, str('iteration_' + writer.get_folder_name()), iteration)
-        writer.store_metric(str('Loss_' + writer.get_folder_name() + '/loss_classifier'), loss_classifier, str('iteration_' + writer.get_folder_name()), iteration)
-        writer.store_metric(str('Loss_' + writer.get_folder_name() + '/loss_box_reg'), loss_box_reg, str('iteration_' + writer.get_folder_name()), iteration)
-        writer.store_metric(str('Loss_' + writer.get_folder_name() + '/loss_objectness'), loss_objectness, str('iteration_' + writer.get_folder_name()), iteration)
-        writer.store_metric(str('Loss_' + writer.get_folder_name() + '/loss_rpn_box_reg'), loss_rpn_box_reg, str('iteration_' + writer.get_folder_name()), iteration)
+        if model_name == 'FasterRCNN_ResNet-50-FPN':
+            loss_classifier = loss_dict_reduced['loss_classifier'].item()
+            loss_box_reg = loss_dict_reduced['loss_box_reg'].item()
+            loss_objectness = loss_dict_reduced['loss_objectness'].item()
+            loss_rpn_box_reg = loss_dict_reduced['loss_rpn_box_reg'].item()
 
-        #metric_logger.update(loss=losses_reduced, **loss_dict_reduced)
-        #metric_logger.update(lr=optimizer.param_groups[0]["lr"])
+            writer.store_metric(str('Loss_' + writer.get_folder_name() + '/loss'), loss, str('iteration_' + writer.get_folder_name()), iteration)
+            writer.store_metric(str('Loss_' + writer.get_folder_name() + '/loss_classifier'), loss_classifier, str('iteration_' + writer.get_folder_name()), iteration)
+            writer.store_metric(str('Loss_' + writer.get_folder_name() + '/loss_box_reg'), loss_box_reg, str('iteration_' + writer.get_folder_name()), iteration)
+            writer.store_metric(str('Loss_' + writer.get_folder_name() + '/loss_objectness'), loss_objectness, str('iteration_' + writer.get_folder_name()), iteration)
+            writer.store_metric(str('Loss_' + writer.get_folder_name() + '/loss_rpn_box_reg'), loss_rpn_box_reg, str('iteration_' + writer.get_folder_name()), iteration)
+
+        if model_name == 'SSD' or model_name == 'RetinaNet_ResNet-50-FPN' or model_name == 'FCOS':
+            loss_classifier = loss_dict_reduced['classification'].item()
+            loss_box_reg = loss_dict_reduced['bbox_regression'].item()
+
+            writer.store_metric(str('Loss_' + writer.get_folder_name() + '/loss'), loss, str('iteration_' + writer.get_folder_name()), iteration)
+            writer.store_metric(str('Loss_' + writer.get_folder_name() + '/loss_classifier'), loss_classifier, str('iteration_' + writer.get_folder_name()), iteration)
+            writer.store_metric(str('Loss_' + writer.get_folder_name() + '/loss_box_reg'), loss_box_reg, str('iteration_' + writer.get_folder_name()), iteration)
 
 def compute_confusion_matrix(epoch, writer, foldername_to_save_outputs, dataset, iou_threshold = 0.5):
   # Read all the names of outputs
