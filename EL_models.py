@@ -57,7 +57,7 @@ class Model:
                 num_classes=num_classes, 
                 trainable_backbone_layers=trainable_backbone_layers) # Valid values are between 0 and 5
 
-        elif self.model_name == 'RetinaNet_ResNet-50-FPN v2':
+        elif self.model_name == 'RetinaNet_ResNet-50-FPN_v2':
             # Constructs an improved RetinaNet model with a ResNet-50-FPN backbone.
             self.model = torchvision.models.detection.retinanet_resnet50_fpn_v2(
                 weights= 'DEFAULT',

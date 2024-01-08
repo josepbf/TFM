@@ -3,7 +3,7 @@
 ### –- specify queue --
 #BSUB -q gpuv100
 ### -- set the job Name --
-#BSUB -J firstjob
+#BSUB -J fasterrcnn
 ### -- ask for number of cores (default: 1) --
 #BSUB -n 1
 ### -- Select the resources: 1 gpu in exclusive process mode --
@@ -28,6 +28,6 @@ nvidia-smi
 
 source ../myVirtEnv/bin/activate
 
-/appl/python/3.11.4/bin/python3.11 EL_train.py --save_model_and_optim_epochs 1 --run_id 0 --continue_trainings 0 --epoch_continue_from 0 --num_epochs 5 --data_imbalance_handler 1 --evaluate_every_epochs 1 --activate_custom_epoch 1 --custom_len_epoch 1000 --experiment_name cutom_iterations_4 --run_name custom_len_1000_iter
+/appl/python/3.11.4/bin/python3.11 EL_train.py --save_model_and_optim_epochs 100 --run_id 0 --continue_trainings 0 --epoch_continue_from 0 --num_epochs 15 --data_imbalance_handler 1 --evaluate_every_epochs 1 --activate_custom_epoch 1 --custom_len_epoch 1000 --experiment_name net_arch_0 --run_name FasterRCNN_0 --model_name FasterRCNN_ResNet-50-FPN_v2
 
 deactivate
