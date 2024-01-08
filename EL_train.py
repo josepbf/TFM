@@ -264,7 +264,7 @@ while epoch != num_epochs:
     train_one_epoch(net, optimizer, trainloader, device, epoch, print_freq=100, iteration=iteration, writer = writer_training, activate_custom_epoch = activate_custom_epoch, custom_len_epoch = custom_len_epoch)
     loss_one_epoch_val(net, optimizer, validationloader, device, epoch, print_freq=100, iteration=iteration, writer = writer_validation)
 
-    foldername_to_save_outputs = str("./runs/run_outputs_" + dt_string + "/epoch_" + str(epoch))
+    foldername_to_save_outputs = str("./runs/" + str(run_name) + "run_outputs_" + dt_string + "/epoch_" + str(epoch))
         
     # Log lr
     writer_training.store_metric(str('lr'), lr_scheduler.get_last_lr()[0], 'epoch', epoch)
