@@ -287,7 +287,7 @@ while epoch != num_epochs:
         print("Computing confusion matrix validation...")
         compute_confusion_matrix(epoch, writer_validation, foldername_to_save_outputs, dataset_validation, iou_threshold = 0.5)
 
-    if epoch == 0 or epoch % save_model_and_optim_epochs == 0:
+    if epoch % save_model_and_optim_epochs == 0:
         print("Saving the model at epoch num. " + str(epoch))
         net_object.save_model(experiment_name, run_name, net, epoch)
 
